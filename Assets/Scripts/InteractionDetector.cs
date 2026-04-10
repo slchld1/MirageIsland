@@ -18,6 +18,8 @@ public class InteractionDetector : MonoBehaviour
     {
         if (context.performed)
         {
+            if (interactableRange == null) return;
+
             interactableRange?.Interact();
             if (!interactableRange.CanInteract())
             {
@@ -26,14 +28,6 @@ public class InteractionDetector : MonoBehaviour
                 interactionIcon.SetActive(false);
                 }
             }
-            else
-            {
-                return;
-            }
-        }
-        else
-        {
-            return;
         }
     }
     private void OnTriggerEnter2D(Collider2D collision)
