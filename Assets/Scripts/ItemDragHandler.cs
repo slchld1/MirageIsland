@@ -7,6 +7,8 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     Transform originalParent;
     CanvasGroup canvasGroup;
 
+    private Transform playerTransform;
+
     public float minDropDistance = 1f;
     public float maxDropDistance = 2f;
 
@@ -14,6 +16,7 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     void Awake()
     {
         canvasGroup = GetComponent<CanvasGroup>();
+        playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
     }
     public void OnBeginDrag(PointerEventData eventData)
     {
@@ -93,8 +96,6 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     {
         originalSlot.currentItem = null;
 
-        //Find player
-        Transform playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
         if (playerTransform == null)
         {
             Debug.LogError("Missing 'Player' tag");
@@ -113,7 +114,7 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
         //Instantiate drop item
         GameObject dropItem = Instantiate(gameObject, dropPosition, Quaternion.identity);
-        dropItem.GetComponent<BounceEffect>().startBounce();
+        dropItem.GetComponent<BounceEffect>().StartBounce();
         //Destroy the UI one
         Destroy(gameObject);
 

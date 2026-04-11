@@ -46,7 +46,7 @@ public class Movement : MonoBehaviour
         {
             StartFootsteps();
         }
-        else if(rb.linearVelocity.magnitude == 0)
+        else if(rb.linearVelocity.magnitude == 0 && playingFootsteps)
         {
             StopFootsteps();
         }
@@ -55,8 +55,6 @@ public class Movement : MonoBehaviour
         {
             spriteRenderer.flipX = moveInput.x < 0;
         }
-
-        Debug.Log(moveInput);
 
     }
 

@@ -6,6 +6,7 @@ public class SavedData
 {
     public Vector3 playerPosition;
     public string mapBoundary;
+    public float currentHour;
     public List<InventorySaveData> inventorySaveData;
     public List<InventorySaveData> hotbarSaveData;
     public List<ChestSaveData> chestSaveData;

@@ -12,16 +12,11 @@ public class ItemDictionary : MonoBehaviour
         itemDictionary = new Dictionary<int, GameObject>();
 
         //Auto Increment IDs
-        for(int i = 0; i < itemPrefabs.Count; i++)
+        for (int i = 0; i < itemPrefabs.Count; i++)
         {
-            if (itemPrefabs[i] != null)
-            {
-                itemPrefabs[i].ID = i + 1;
-            }
-        }
-        foreach(Item item in itemPrefabs)
-        {
-            itemDictionary[item.ID] = item.gameObject;
+            if (itemPrefabs[i] == null) continue;
+            itemPrefabs[i].ID = i + 1;
+            itemDictionary[itemPrefabs[i].ID] = itemPrefabs[i].gameObject;
         }
     }
 

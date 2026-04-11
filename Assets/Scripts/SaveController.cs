@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UnityEditor.Overlays;
 using UnityEngine;
 
 public class SaveController : MonoBehaviour
@@ -35,6 +34,7 @@ public class SaveController : MonoBehaviour
         {
             playerPosition = GameObject.FindWithTag("Player").transform.position,
             mapBoundary = FindAnyObjectByType<CinemachineConfiner>().m_BoundingShape2D.gameObject.name,
+            currentHour = DayCycleManager.Instance != null ? DayCycleManager.Instance.CurrentHour : 6f,
             inventorySaveData = inventoryController.GetInventoryItems(),
             hotbarSaveData = hotbarController.GetHotbarItems(),
             chestSaveData = GetChestState(),
@@ -68,6 +68,9 @@ public class SaveController : MonoBehaviour
 
             GameObject.FindWithTag("Player").transform.position = saveData.playerPosition;
 
+            float loadedHour = saveData.currentHour > 0f ? saveData.currentHour : 5f;
+            DayCycleManager.Instance?.SetTime(loadedHour);
+
             PolygonCollider2D savedMapBoundary = GameObject.Find(saveData.mapBoundary).GetComponent<PolygonCollider2D>();
             FindAnyObjectByType<CinemachineConfiner>().m_BoundingShape2D = savedMapBoundary;
 
@@ -84,6 +87,8 @@ public class SaveController : MonoBehaviour
         }
         else
         {
+            DayCycleManager.Instance?.SetTime(5f);
+
             SaveGame();
 
             inventoryController.SetInventoryItems(new List<InventorySaveData>());

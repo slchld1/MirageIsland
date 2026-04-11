@@ -13,11 +13,8 @@ public class Chest : MonoBehaviour, IInteractable
         ChestID ??= GlobalHelper.GenerateUniqueId(gameObject); //UniqueID
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public string InteractionPrompt => IsOpened ? "" : "Open";
+
     public bool CanInteract()
     {
         return !IsOpened;
@@ -37,14 +34,15 @@ public class Chest : MonoBehaviour, IInteractable
         if(itemPrefab)
         {
             GameObject droppedItem = Instantiate(itemPrefab, transform.position + Vector3.down, Quaternion.identity);
-            droppedItem.GetComponent<BounceEffect>().startBounce();
+            droppedItem.GetComponent<BounceEffect>().StartBounce();
         }
 
     }
 
     public void SetOpened(bool opened)
     {
-        if(IsOpened = opened)
+        IsOpened = opened;
+        if(IsOpened)
         {
             GetComponent<SpriteRenderer>().sprite = openedSprite;
         }

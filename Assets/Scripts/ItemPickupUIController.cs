@@ -47,10 +47,10 @@ public class ItemPickupUIController : MonoBehaviour
         }
         
         //Fade out and destroy
-        StartCoroutine(FadeOutAndDestory(newPopup));
+        StartCoroutine(FadeOutAndDestroy(newPopup));
     }
 
-    private IEnumerator FadeOutAndDestory(GameObject popup)
+    private IEnumerator FadeOutAndDestroy(GameObject popup)
     {
         yield return new WaitForSeconds(popupDuration);
         if (popup == null ) yield break;

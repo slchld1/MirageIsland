@@ -14,7 +14,7 @@ TagManager:
   - UI
   - Player
   - Object
-  - 
+  - Overlay
   - 
   - 
   - 
@@ -63,6 +63,16 @@ TagManager:
   - name: Decor
     uniqueID: 3974083521
     locked: 0
+  - name: Overlay
+    uniqueID: 1361257475
+    locked: 0
+  - name: UI
+    uniqueID: 2664132611
+    locked: 0
   m_RenderingLayers:
   - Default
   - Layer 1
+  - Layer 2
+  - Layer 3
+  - Layer 4
+  - Layer 5

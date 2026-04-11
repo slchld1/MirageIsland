@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class MapController_Manual : MonoBehaviour
 {
-    public static MapController_Manual Instance { get; set; }
+    public static MapController_Manual Instance { get; private set; }
 
     public GameObject mapParent;
     List<Image> mapImages;

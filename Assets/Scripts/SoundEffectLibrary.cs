@@ -23,9 +23,8 @@ public class SoundEffectLibrary : MonoBehaviour
     
     public AudioClip GetRandomClip(string name)
     {
-        if(soundDictionary.ContainsKey(name))
+        if(soundDictionary.TryGetValue(name, out List<AudioClip> audioClips))
         {
-            List<AudioClip> audioClips = soundDictionary[name];
             if(audioClips.Count > 0)
             {
                 return audioClips[UnityEngine.Random.Range(0, audioClips.Count)];
