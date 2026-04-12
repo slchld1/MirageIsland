@@ -22,8 +22,12 @@ public class FishLootTable : MonoBehaviour
     {
         var pool = new List<(int itemID, int weight)>();
 
+        if (fishEntries == null) return -1;
+
         foreach (FishData fish in fishEntries)
         {
+            if (fish == null) continue;
+
             int weight = fish.baseWeight
                 + GetPhaseBonus(fish, phase)
                 + GetBaitBonus(fish, bait)
@@ -72,7 +76,7 @@ public class FishLootTable : MonoBehaviour
 
     private int GetRodBonus(FishData fish, int rodTier)
     {
-        if (fish.rodTierBonuses == null || rodTier - 1 >= fish.rodTierBonuses.Length) return 0;
+        if (fish.rodTierBonuses == null || rodTier < 1 || rodTier - 1 >= fish.rodTierBonuses.Length) return 0;
         return fish.rodTierBonuses[rodTier - 1];
     }
 }
