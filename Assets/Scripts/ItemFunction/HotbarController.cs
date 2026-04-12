@@ -49,7 +49,8 @@ public class HotbarController : MonoBehaviour
         if (SelectedSlotIndex < 0 || SelectedSlotIndex >= hotbarpanel.transform.childCount)
             return null;
         Slot slot = hotbarpanel.transform.GetChild(SelectedSlotIndex).GetComponent<Slot>();
-        return slot.currentItem != null ? slot.currentItem.GetComponent<Item>() : null;
+        if (slot == null || slot.currentItem == null) return null;
+        return slot.currentItem.GetComponent<Item>();
     }
 
     public List<InventorySaveData> GetHotbarItems()
@@ -58,11 +59,10 @@ public class HotbarController : MonoBehaviour
         foreach (Transform slotTransform in hotbarpanel.transform)
         {
             Slot slot = slotTransform.GetComponent<Slot>();
-            if (slot.currentItem != null)
-            {
-                Item item = slot.currentItem.GetComponent<Item>();
-                invData.Add(new InventorySaveData { itemID = item.ID, slotIndex = slotTransform.GetSiblingIndex() });
-            }
+            if (slot == null || slot.currentItem == null) continue;
+            Item item = slot.currentItem.GetComponent<Item>();
+            if (item == null) continue;
+            invData.Add(new InventorySaveData { itemID = item.ID, slotIndex = slotTransform.GetSiblingIndex() });
         }
         return invData;
     }
