@@ -10,9 +10,9 @@ using UnityEngine.InputSystem;
 public class FishingLine : MonoBehaviour
 {
     [Header("Nudge")]
-    public float nudgeSpeed = 2f;
+    public float nudgeSpeed = 1f;
     [Tooltip("How far the bobber can move from the player via Q/E nudge")]
-    [SerializeField] private float maxNudgeDistance = 1f;
+    [SerializeField] private float maxNudgeDistance = 0.3f;
 
     [Header("Proximity")]
     [Tooltip("Max catch-rate bonus at closest range (e.g. 0.2 = +20% speed)")]
@@ -77,10 +77,9 @@ public class FishingLine : MonoBehaviour
         if (nudge != 0f)
         {
             bobPosition += Vector2.right * nudge * nudgeSpeed * Time.deltaTime;
-            // Clamp so the bobber stays within maxNudgeDistance of the player
-            Vector2 toPlayer = bobPosition - (Vector2)transform.position;
-            if (toPlayer.magnitude > maxNudgeDistance)
-                bobPosition = (Vector2)transform.position + toPlayer.normalized * maxNudgeDistance;
+            // Clamp so the bobber stays within maxNudgeDistance of the original cast point
+            float offset = Mathf.Clamp(bobPosition.x - castPoint.x, -maxNudgeDistance, maxNudgeDistance);
+            bobPosition = new Vector2(castPoint.x + offset, castPoint.y);
             UpdateLine();
         }
 
