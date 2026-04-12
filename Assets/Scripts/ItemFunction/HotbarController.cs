@@ -36,12 +36,12 @@ public class HotbarController : MonoBehaviour
 
     void UseItemInSlot(int index)
     {
+        if (index < 0 || index >= hotbarpanel.transform.childCount) return;
         Slot slot = hotbarpanel.transform.GetChild(index).GetComponent<Slot>();
-        if (slot.currentItem != null)
-        {
-            Item item = slot.currentItem.GetComponent<Item>();
-            item.UseItem();
-        }
+        if (slot == null || slot.currentItem == null) return;
+        Item item = slot.currentItem.GetComponent<Item>();
+        if (item == null) return;
+        item.UseItem();
     }
 
     public Item GetActiveItem()
