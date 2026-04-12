@@ -15,14 +15,14 @@ public class FishLootTable : MonoBehaviour
     }
 
     /// <summary>
-    /// Returns the itemID of a randomly selected fish based on rod tier, bait, and time of day.
-    /// Returns -1 if the pool is empty.
+    /// Returns a randomly selected FishData based on rod tier, bait, and time of day.
+    /// Returns null if the pool is empty.
     /// </summary>
-    public int Roll(int rodTier, BaitType bait, TimeOfDay phase)
+    public FishData Roll(int rodTier, BaitType bait, TimeOfDay phase)
     {
-        var pool = new List<(int itemID, int weight)>();
+        var pool = new List<(FishData fish, int weight)>();
 
-        if (fishEntries == null) return -1;
+        if (fishEntries == null) return null;
 
         foreach (FishData fish in fishEntries)
         {
@@ -34,10 +34,10 @@ public class FishLootTable : MonoBehaviour
                 + GetRodBonus(fish, rodTier);
 
             if (weight > 0)
-                pool.Add((fish.itemID, weight));
+                pool.Add((fish, weight));
         }
 
-        if (pool.Count == 0) return -1;
+        if (pool.Count == 0) return null;
 
         int total = 0;
         foreach (var entry in pool) total += entry.weight;
@@ -47,10 +47,10 @@ public class FishLootTable : MonoBehaviour
         foreach (var entry in pool)
         {
             cumulative += entry.weight;
-            if (roll < cumulative) return entry.itemID;
+            if (roll < cumulative) return entry.fish;
         }
 
-        return pool[pool.Count - 1].itemID;
+        return pool[pool.Count - 1].fish;
     }
 
     private int GetPhaseBonus(FishData fish, TimeOfDay phase)
