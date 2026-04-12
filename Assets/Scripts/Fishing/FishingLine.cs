@@ -18,9 +18,14 @@ public class FishingLine : MonoBehaviour
     public float maxProximityBonus = 0.2f;
     public float proximityRange = 2f;
 
+    [Header("Bobber")]
+    [Tooltip("Prefab with a SpriteRenderer — sits at the end of the line in the water")]
+    public GameObject bobberPrefab;
+
     private LineRenderer lineRenderer;
     private Vector2 castPoint;
     private Vector2 bobPosition;
+    private GameObject bobberInstance;
 
     public Vector2 BobPosition => bobPosition;
 
@@ -43,11 +48,17 @@ public class FishingLine : MonoBehaviour
         LastBlinkPosition = castTarget;
         lineRenderer.enabled = true;
         UpdateLine();
+        SpawnBobber();
     }
 
     public void Hide()
     {
         lineRenderer.enabled = false;
+        if (bobberInstance != null)
+        {
+            Destroy(bobberInstance);
+            bobberInstance = null;
+        }
     }
 
     private void Update()
@@ -65,6 +76,17 @@ public class FishingLine : MonoBehaviour
             bobPosition = new Vector2(castPoint.x + offset, castPoint.y);
             UpdateLine();
         }
+
+        // Keep bobber sitting on the bob position
+        if (bobberInstance != null)
+            bobberInstance.transform.position = bobPosition;
+    }
+
+    private void SpawnBobber()
+    {
+        if (bobberPrefab == null) return;
+        if (bobberInstance != null) Destroy(bobberInstance);
+        bobberInstance = Instantiate(bobberPrefab, bobPosition, Quaternion.identity);
     }
 
     private void UpdateLine()
