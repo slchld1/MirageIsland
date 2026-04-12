@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 /// <summary>
 /// Tension-based tug minigame with per-species fight phases and reaction events.
@@ -99,7 +98,7 @@ public class TugMinigame : MonoBehaviour
     /// Called each frame by FishingController.
     /// holdingButton = LMB is held. lmbJustPressed = LMB was pressed this frame.
     /// </summary>
-    public void Tick(bool holdingButton, bool lmbJustPressed)
+    public void Tick(bool holdingButton, bool lmbJustPressed, bool pressedQ, bool pressedE)
     {
         if (!active) return;
 
@@ -162,7 +161,7 @@ public class TugMinigame : MonoBehaviour
         }
 
         TickPhase();
-        TickEvent(lmbJustPressed);
+        TickEvent(lmbJustPressed, pressedQ, pressedE);
     }
 
     // ── Phase stepping ────────────────────────────────────────────────────────
@@ -183,7 +182,7 @@ public class TugMinigame : MonoBehaviour
 
     // ── Event firing and resolution ───────────────────────────────────────────
 
-    private void TickEvent(bool lmbJustPressed)
+    private void TickEvent(bool lmbJustPressed, bool pressedQ, bool pressedE)
     {
         if (currentFish == null || currentFish.phases == null || currentFish.phases.Length == 0) return;
 
@@ -206,9 +205,6 @@ public class TugMinigame : MonoBehaviour
 
             if (ActiveEvent == EventType.Dart)
             {
-                bool pressedQ = Keyboard.current.qKey.wasPressedThisFrame;
-                bool pressedE = Keyboard.current.eKey.wasPressedThisFrame;
-
                 if ((ActiveEventDir == -1 && pressedQ) || (ActiveEventDir == 1 && pressedE))
                 {
                     resolved = true; hit = true;
