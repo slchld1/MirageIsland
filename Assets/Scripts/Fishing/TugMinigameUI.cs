@@ -2,14 +2,15 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Drives the tension bar and reel progress bar during the tug minigame.
-/// Attach to a Canvas child GameObject. Assign the panel, tension fill image, and reel fill image.
-/// The panel is hidden by default and shown by FishingController during minigame.
+/// Drives the tension bar, reel bar, and reaction event prompts during the tug minigame.
+/// Attach to a Canvas child. Assign all references in the Inspector.
 /// </summary>
 public class TugMinigameUI : MonoBehaviour
 {
-    [Header("References")]
+    [Header("Panel")]
     public GameObject panel;
+
+    [Header("Bars")]
     [Tooltip("Image with Image Type = Filled, Fill Method = Vertical")]
     public Image tensionFill;
     [Tooltip("Image with Image Type = Filled, Fill Method = Horizontal")]
@@ -19,6 +20,14 @@ public class TugMinigameUI : MonoBehaviour
     public Color safeColor    = Color.green;
     public Color warningColor = Color.yellow;
     public Color dangerColor  = Color.red;
+
+    [Header("Event Prompts")]
+    [Tooltip("GameObject shown during a Dart event. Should contain a Text child.")]
+    public GameObject dartPrompt;
+    [Tooltip("Text component inside dartPrompt that shows '← Q' or 'E →'")]
+    public Text dartPromptText;
+    [Tooltip("GameObject shown during a Tug event")]
+    public GameObject tugPrompt;
 
     private TugMinigame tugMinigame;
 
@@ -36,13 +45,30 @@ public class TugMinigameUI : MonoBehaviour
         if (panel == null || !panel.activeSelf) return;
         if (tugMinigame == null) return;
 
+        // Tension bar
         float t = tugMinigame.Tension;
-        tensionFill.fillAmount = t;
+        if (tensionFill != null)
+        {
+            tensionFill.fillAmount = t;
+            tensionFill.color = t > 0.8f ? dangerColor : t > 0.6f ? warningColor : safeColor;
+        }
 
-        if (t > 0.8f)      tensionFill.color = dangerColor;
-        else if (t > 0.6f) tensionFill.color = warningColor;
-        else               tensionFill.color = safeColor;
+        // Reel bar
+        if (reelFill != null)
+            reelFill.fillAmount = tugMinigame.ReelProgress;
 
-        reelFill.fillAmount = tugMinigame.ReelProgress;
+        // Event prompts
+        bool isDart = tugMinigame.ActiveEvent == EventType.Dart;
+        bool isTug  = tugMinigame.ActiveEvent == EventType.Tug;
+
+        if (dartPrompt != null)
+        {
+            dartPrompt.SetActive(isDart);
+            if (isDart && dartPromptText != null)
+                dartPromptText.text = tugMinigame.ActiveEventDir == -1 ? "← Q" : "E →";
+        }
+
+        if (tugPrompt != null)
+            tugPrompt.SetActive(isTug);
     }
 }
