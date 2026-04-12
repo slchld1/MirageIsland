@@ -11,6 +11,7 @@ public enum FishingState { Idle, Waiting, Minigame }
 public class FishingController : MonoBehaviour
 {
     public static FishingController Instance { get; private set; }
+    public static bool IsFishing { get; private set; }
 
     [Header("Water Detection")]
     [Tooltip("Set to the 'Water' layer in Project Settings")]
@@ -91,8 +92,10 @@ public class FishingController : MonoBehaviour
         if (hit == null) return;
 
         fishingLine.Initialize(mouseWorld);
+        fishingLine.NudgeEnabled = true;
         biteDetector.StartDetection();
         state = FishingState.Waiting;
+        IsFishing = true;
         SoundEffectManager.Play("FishCast");
     }
 
@@ -125,6 +128,7 @@ public class FishingController : MonoBehaviour
     private void OnFishBite()
     {
         state = FishingState.Minigame;
+        fishingLine.NudgeEnabled = false; // bobber locks in place during reel
         int rodTier = ActiveRod != null ? ActiveRod.rodTier : 1;
         tugMinigame.StartMinigame(rodTier);
         tugMinigameUI.Show();
@@ -175,10 +179,12 @@ public class FishingController : MonoBehaviour
     private void CancelFishing()
     {
         fishingLine.Hide();
+        fishingLine.NudgeEnabled = true;
         biteDetector.StopDetection();
         tugMinigame.StopMinigame();
         tugMinigameUI.Hide();
         state = FishingState.Idle;
+        IsFishing = false;
         ActiveRod = null;
     }
 }

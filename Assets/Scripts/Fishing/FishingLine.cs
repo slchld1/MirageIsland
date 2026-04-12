@@ -28,6 +28,7 @@ public class FishingLine : MonoBehaviour
     private GameObject bobberInstance;
 
     public Vector2 BobPosition => bobPosition;
+    public bool NudgeEnabled { get; set; } = true;
 
     // Set externally by FishBiteDetector when a blink spawns
     public Vector2 LastBlinkPosition { get; set; }
@@ -66,8 +67,11 @@ public class FishingLine : MonoBehaviour
         if (!lineRenderer.enabled) return;
 
         float nudge = 0f;
-        if (Keyboard.current.qKey.isPressed) nudge = -1f;
-        else if (Keyboard.current.eKey.isPressed) nudge = 1f;
+        if (NudgeEnabled)
+        {
+            if (Keyboard.current.qKey.isPressed) nudge = -1f;
+            else if (Keyboard.current.eKey.isPressed) nudge = 1f;
+        }
 
         if (nudge != 0f)
         {
