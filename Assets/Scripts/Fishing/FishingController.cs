@@ -1,12 +1,12 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public enum FishingState { Idle, Waiting, Minigame }
+public enum FishingState { Idle, Casting, Waiting, Minigame }
 
 /// <summary>
-/// State machine that owns the fishing flow: Idle → Waiting → Minigame → back.
+/// State machine: Idle → Casting → Waiting → Minigame → back.
 /// Attach to the Player GameObject alongside FishingLine, FishBiteDetector, TugMinigame.
-/// Requires a "Water" physics layer set up in Project Settings → Tags and Layers.
+/// Requires a "Water" physics layer in Project Settings → Tags and Layers.
 /// </summary>
 public class FishingController : MonoBehaviour
 {
@@ -20,14 +20,15 @@ public class FishingController : MonoBehaviour
     public FishingRod ActiveRod { get; private set; }
 
     private HotbarController hotbarController;
-    private Inventory inventory;
-    private ItemDictionary itemDictionary;
-    private FishingLine fishingLine;
-    private FishBiteDetector biteDetector;
-    private TugMinigame tugMinigame;
-    private TugMinigameUI tugMinigameUI;
+    private Inventory         inventory;
+    private ItemDictionary    itemDictionary;
+    private FishingLine       fishingLine;
+    private FishBiteDetector  biteDetector;
+    private TugMinigame       tugMinigame;
+    private TugMinigameUI     tugMinigameUI;
 
-    private FishingState state = FishingState.Idle;
+    private FishingState state     = FishingState.Idle;
+    private FishData     rolledFish;
 
     private void Awake()
     {
@@ -45,9 +46,9 @@ public class FishingController : MonoBehaviour
 
     private void Start()
     {
-        biteDetector.OnBite      += OnFishBite;
-        tugMinigame.OnCatch      += OnFishCaught;
-        tugMinigame.OnEscape     += OnFishEscaped;
+        biteDetector.OnBite  += OnFishBite;
+        tugMinigame.OnCatch  += OnFishCaught;
+        tugMinigame.OnEscape += OnFishEscaped;
     }
 
     private void OnDestroy()
@@ -64,8 +65,9 @@ public class FishingController : MonoBehaviour
     {
         switch (state)
         {
-            case FishingState.Idle:    UpdateIdle();    break;
-            case FishingState.Waiting: UpdateWaiting(); break;
+            case FishingState.Idle:     UpdateIdle();     break;
+            case FishingState.Casting:  UpdateCasting();  break;
+            case FishingState.Waiting:  UpdateWaiting();  break;
             case FishingState.Minigame: UpdateMinigame(); break;
         }
     }
@@ -87,23 +89,44 @@ public class FishingController : MonoBehaviour
         Vector3 screenPos = Mouse.current.position.ReadValue();
         screenPos.z = -Camera.main.transform.position.z;
         Vector2 mouseWorld = Camera.main.ScreenToWorldPoint(screenPos);
+
+        // Clamp to rod's cast distance
+        Vector2 playerPos = transform.position;
+        Vector2 dir       = mouseWorld - playerPos;
+        float   maxDist   = ActiveRod != null ? ActiveRod.castDistance : 3f;
+        if (dir.magnitude > maxDist)
+            mouseWorld = playerPos + dir.normalized * maxDist;
+
         Collider2D hit = Physics2D.OverlapPoint(mouseWorld, waterLayer);
-        Debug.Log($"[Fishing] Cast at world pos {mouseWorld}, water hit: {(hit != null ? hit.gameObject.name : "NONE")}, waterLayer mask: {waterLayer.value}");
         if (hit == null) return;
 
-        fishingLine.Initialize(mouseWorld);
+        float speed = ActiveRod != null ? ActiveRod.castSpeed : 6f;
+        fishingLine.NudgeEnabled = false;
+        fishingLine.Cast(mouseWorld, speed, OnCastLanded);
+        state     = FishingState.Casting;
+        IsFishing = true;
+        SoundEffectManager.Play("FishCast");
+    }
+
+    // ── Casting ───────────────────────────────────────────────────────────────
+
+    private void UpdateCasting()
+    {
+        if (Mouse.current.rightButton.wasPressedThisFrame)
+            CancelFishing();
+    }
+
+    private void OnCastLanded()
+    {
         fishingLine.NudgeEnabled = true;
         biteDetector.StartDetection();
         state = FishingState.Waiting;
-        IsFishing = true;
-        SoundEffectManager.Play("FishCast");
     }
 
     // ── Waiting ───────────────────────────────────────────────────────────────
 
     private void UpdateWaiting()
     {
-        // Cancel on right-click or hotbar swap away from rod
         if (Mouse.current.rightButton.wasPressedThisFrame
             || !(hotbarController.GetActiveItem() is FishingRod))
         {
@@ -119,18 +142,26 @@ public class FishingController : MonoBehaviour
 
     private void UpdateMinigame()
     {
-        bool holding = Mouse.current.leftButton.isPressed;
-        tugMinigame.Tick(holding);
+        bool holding     = Mouse.current.leftButton.isPressed;
+        bool justPressed = Mouse.current.leftButton.wasPressedThisFrame;
+        bool pressedQ    = Keyboard.current?.qKey.wasPressedThisFrame ?? false;
+        bool pressedE    = Keyboard.current?.eKey.wasPressedThisFrame ?? false;
+        tugMinigame.Tick(holding, justPressed, pressedQ, pressedE);
     }
 
     // ── Events ────────────────────────────────────────────────────────────────
 
     private void OnFishBite()
     {
+        // Roll the fish species now so we have its fight profile for the minigame
+        int       rodTier = ActiveRod != null ? ActiveRod.rodTier      : 1;
+        BaitType  bait    = ActiveRod != null ? ActiveRod.equippedBait : BaitType.None;
+        TimeOfDay phase   = DayCycleManager.Instance.CurrentPhase;
+        rolledFish        = FishLootTable.Instance.Roll(rodTier, bait, phase);
+
         state = FishingState.Minigame;
-        fishingLine.NudgeEnabled = false; // bobber locks in place during reel
-        int rodTier = ActiveRod != null ? ActiveRod.rodTier : 1;
-        tugMinigame.StartMinigame(rodTier);
+        fishingLine.NudgeEnabled = false;
+        tugMinigame.StartMinigame(rodTier, rolledFish);
         tugMinigameUI.Show();
         SoundEffectManager.Play("FishBite");
     }
@@ -139,14 +170,9 @@ public class FishingController : MonoBehaviour
     {
         tugMinigameUI.Hide();
 
-        int rodTier  = ActiveRod != null ? ActiveRod.rodTier : 1;
-        BaitType bait = ActiveRod != null ? ActiveRod.equippedBait : BaitType.None;
-        TimeOfDay phase = DayCycleManager.Instance.CurrentPhase;
-
-        int fishItemID = FishLootTable.Instance.Roll(rodTier, bait, phase);
-        if (fishItemID >= 0)
+        if (rolledFish != null)
         {
-            GameObject fishPrefab = itemDictionary.GetItemPrefab(fishItemID);
+            GameObject fishPrefab = itemDictionary.GetItemPrefab(rolledFish.itemID);
             if (fishPrefab != null)
                 inventory.AddItem(fishPrefab);
         }
@@ -157,11 +183,12 @@ public class FishingController : MonoBehaviour
             ActiveRod.baitCount--;
             if (ActiveRod.baitCount <= 0)
             {
-                ActiveRod.baitCount = 0;
+                ActiveRod.baitCount    = 0;
                 ActiveRod.equippedBait = BaitType.None;
             }
         }
 
+        rolledFish = null;
         SoundEffectManager.Play("FishCatch");
         CancelFishing();
     }
@@ -171,8 +198,8 @@ public class FishingController : MonoBehaviour
         tugMinigameUI.Hide();
         tugMinigame.StopMinigame();
         fishingLine.NudgeEnabled = true;
-        // Return to Waiting — another fish can bite
         biteDetector.ResetForNextFish();
+        rolledFish = null;
         state = FishingState.Waiting;
         SoundEffectManager.Play("FishEscape");
     }
@@ -184,8 +211,9 @@ public class FishingController : MonoBehaviour
         biteDetector.StopDetection();
         tugMinigame.StopMinigame();
         tugMinigameUI.Hide();
-        state = FishingState.Idle;
-        IsFishing = false;
-        ActiveRod = null;
+        rolledFish = null;
+        state      = FishingState.Idle;
+        IsFishing  = false;
+        ActiveRod  = null;
     }
 }
