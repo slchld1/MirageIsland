@@ -170,6 +170,7 @@ public class FishingController : MonoBehaviour
     {
         tugMinigameUI.Hide();
         tugMinigame.StopMinigame();
+        fishingLine.NudgeEnabled = true;
         // Return to Waiting — another fish can bite
         biteDetector.ResetForNextFish();
         state = FishingState.Waiting;
