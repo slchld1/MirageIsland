@@ -11,7 +11,8 @@ public class FishingLine : MonoBehaviour
 {
     [Header("Nudge")]
     public float nudgeSpeed = 2f;
-    public float maxNudgeDistance = 3f;
+    [Tooltip("How far the bobber can move from the player via Q/E nudge")]
+    [SerializeField] private float maxNudgeDistance = 1f;
 
     [Header("Proximity")]
     [Tooltip("Max catch-rate bonus at closest range (e.g. 0.2 = +20% speed)")]
@@ -76,8 +77,10 @@ public class FishingLine : MonoBehaviour
         if (nudge != 0f)
         {
             bobPosition += Vector2.right * nudge * nudgeSpeed * Time.deltaTime;
-            float offset = Mathf.Clamp(bobPosition.x - castPoint.x, -maxNudgeDistance, maxNudgeDistance);
-            bobPosition = new Vector2(castPoint.x + offset, castPoint.y);
+            // Clamp so the bobber stays within maxNudgeDistance of the player
+            Vector2 toPlayer = bobPosition - (Vector2)transform.position;
+            if (toPlayer.magnitude > maxNudgeDistance)
+                bobPosition = (Vector2)transform.position + toPlayer.normalized * maxNudgeDistance;
             UpdateLine();
         }
 
