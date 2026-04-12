@@ -25,15 +25,6 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "ToggleUI",
-                    "type": "Button",
-                    "id": "da36856d-b089-45c7-b0ff-1808083f3753",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "Interact",
                     "type": "Button",
                     "id": "76a0b478-18b5-449e-94e1-8aef1940eeb2",
@@ -107,17 +98,6 @@
                     "processors": "",
                     "groups": "",
                     "action": "Attack",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "a933aa3d-5c7e-4464-a755-eca31157c841",
-                    "path": "<Keyboard>/e",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard&Mouse",
-                    "action": "ToggleUI",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -660,7 +640,7 @@
                 {
                     "name": "",
                     "id": "769ea3ed-1163-4a45-87e1-5515514805eb",
-                    "path": "<Keyboard>/e",
+                    "path": "<Keyboard>/tab",
                     "interactions": "",
                     "processors": "",
                     "groups": "",

@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -43,18 +45,46 @@ public class FishingLine : MonoBehaviour
         lineRenderer.enabled = false;
     }
 
-    public void Initialize(Vector2 castTarget)
+    public bool IsCasting { get; private set; }
+
+    /// <summary>
+    /// Animates the bobber from the player to castTarget at the given speed,
+    /// then calls onLanded. While casting, the line is drawn from player to
+    /// the bobber's current mid-air position.
+    /// </summary>
+    public void Cast(Vector2 castTarget, float speed, Action onLanded)
     {
-        castPoint = castTarget;
-        bobPosition = castTarget;
+        castPoint    = castTarget;
+        bobPosition  = transform.position; // start at player
         LastBlinkPosition = castTarget;
         lineRenderer.enabled = true;
-        UpdateLine();
         SpawnBobber();
+        StartCoroutine(CastRoutine(castTarget, speed, onLanded));
+    }
+
+    private IEnumerator CastRoutine(Vector2 target, float speed, Action onLanded)
+    {
+        IsCasting = true;
+        while (Vector2.Distance(bobPosition, target) > 0.01f)
+        {
+            bobPosition = Vector2.MoveTowards(bobPosition, target, speed * Time.deltaTime);
+            UpdateLine();
+            if (bobberInstance != null)
+                bobberInstance.transform.position = bobPosition;
+            yield return null;
+        }
+        bobPosition = target;
+        UpdateLine();
+        if (bobberInstance != null)
+            bobberInstance.transform.position = bobPosition;
+        IsCasting = false;
+        onLanded?.Invoke();
     }
 
     public void Hide()
     {
+        StopAllCoroutines();
+        IsCasting = false;
         lineRenderer.enabled = false;
         if (bobberInstance != null)
         {
