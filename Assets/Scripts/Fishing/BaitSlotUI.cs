@@ -26,6 +26,7 @@ public class BaitSlotUI : MonoBehaviour
 
     private void Update()
     {
+        if (fishingController == null) { panel.SetActive(false); return; }
         FishingRod rod = fishingController.ActiveRod;
 
         if (rod == null)
