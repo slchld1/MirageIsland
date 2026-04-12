@@ -12,6 +12,7 @@ public class FishData
 {
     public string fishName;
     public int itemID;           // must match an ID in ItemDictionary
+    [Tooltip("Base selection weight. Higher = more common. Combined with bonuses before rolling.")]
     public int baseWeight;
 
     [Header("Time of Day Bonuses")]
