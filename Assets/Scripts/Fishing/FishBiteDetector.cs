@@ -77,10 +77,16 @@ public class FishBiteDetector : MonoBehaviour
         if (fishBlinkPrefab == null) return;
         if (fishingLine == null) return;
 
-        Vector2 blinkPos = fishingLine.BobPosition + UnityEngine.Random.insideUnitCircle * blinkRadius;
-        GameObject blink = Instantiate(fishBlinkPrefab, blinkPos, Quaternion.identity);
+        Vector2 bobPos = fishingLine.BobPosition;
+
+        // Spawn further out from the bob so the fish has room to swim in
+        Vector2 spawnOffset = UnityEngine.Random.insideUnitCircle.normalized * blinkRadius;
+        Vector2 spawnPos = bobPos + spawnOffset;
+
+        GameObject blink = Instantiate(fishBlinkPrefab, spawnPos, Quaternion.identity);
+        blink.GetComponent<FishBlink>()?.Initialize(bobPos);
 
         // Tell FishingLine where this blink appeared so proximity can be calculated
-        fishingLine.LastBlinkPosition = blinkPos;
+        fishingLine.LastBlinkPosition = spawnPos;
     }
 }
