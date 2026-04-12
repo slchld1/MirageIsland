@@ -34,6 +34,7 @@ public class TugMinigameUI : MonoBehaviour
     private void Awake()
     {
         tugMinigame = FindAnyObjectByType<TugMinigame>();
+        if (tugMinigame == null) Debug.LogError("[TugMinigameUI] TugMinigame not found in scene.", this);
         if (panel != null) panel.SetActive(false);
     }
 
@@ -64,8 +65,13 @@ public class TugMinigameUI : MonoBehaviour
         if (dartPrompt != null)
         {
             dartPrompt.SetActive(isDart);
-            if (isDart && dartPromptText != null)
-                dartPromptText.text = tugMinigame.ActiveEventDir == -1 ? "← Q" : "E →";
+            if (isDart)
+            {
+                if (dartPromptText != null)
+                    dartPromptText.text = tugMinigame.ActiveEventDir == -1 ? "← Q" : "E →";
+                else
+                    Debug.LogWarning("[TugMinigameUI] dartPromptText is not assigned.", this);
+            }
         }
 
         if (tugPrompt != null)
