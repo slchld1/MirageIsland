@@ -83,8 +83,11 @@ public class FishingController : MonoBehaviour
 
     private void TryCast()
     {
-        Vector2 mouseWorld = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+        Vector3 screenPos = Mouse.current.position.ReadValue();
+        screenPos.z = -Camera.main.transform.position.z;
+        Vector2 mouseWorld = Camera.main.ScreenToWorldPoint(screenPos);
         Collider2D hit = Physics2D.OverlapPoint(mouseWorld, waterLayer);
+        Debug.Log($"[Fishing] Cast at world pos {mouseWorld}, water hit: {(hit != null ? hit.gameObject.name : "NONE")}, waterLayer mask: {waterLayer.value}");
         if (hit == null) return;
 
         fishingLine.Initialize(mouseWorld);
