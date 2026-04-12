@@ -25,7 +25,7 @@ public class TugMinigameUI : MonoBehaviour
     private void Awake()
     {
         tugMinigame = FindAnyObjectByType<TugMinigame>();
-        panel.SetActive(false);
+        if (panel != null) panel.SetActive(false);
     }
 
     public void Show() => panel.SetActive(true);
@@ -33,7 +33,8 @@ public class TugMinigameUI : MonoBehaviour
 
     private void Update()
     {
-        if (!panel.activeSelf) return;
+        if (panel == null || !panel.activeSelf) return;
+        if (tugMinigame == null) return;
 
         float t = tugMinigame.Tension;
         tensionFill.fillAmount = t;
