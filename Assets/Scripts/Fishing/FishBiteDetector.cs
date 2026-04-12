@@ -75,6 +75,7 @@ public class FishBiteDetector : MonoBehaviour
     private void SpawnBlink()
     {
         if (fishBlinkPrefab == null) return;
+        if (fishingLine == null) return;
 
         Vector2 blinkPos = fishingLine.BobPosition + UnityEngine.Random.insideUnitCircle * blinkRadius;
         GameObject blink = Instantiate(fishBlinkPrefab, blinkPos, Quaternion.identity);
