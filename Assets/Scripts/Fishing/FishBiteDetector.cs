@@ -29,16 +29,21 @@ public class FishBiteDetector : MonoBehaviour
         fishingLine = GetComponent<FishingLine>();
     }
 
+    private GameObject fishInstance;
+    private FishBlink fishBlink;
+
     public void StartDetection()
     {
         active = true;
         biteTimer = UnityEngine.Random.Range(minWaitTime, maxWaitTime);
         blinkTimer = blinkInterval;
+        SpawnFish();
     }
 
     public void StopDetection()
     {
         active = false;
+        DestroyFish();
     }
 
     public void ResetForNextFish()
@@ -46,6 +51,7 @@ public class FishBiteDetector : MonoBehaviour
         active = true;
         biteTimer = UnityEngine.Random.Range(minWaitTime, maxWaitTime);
         blinkTimer = blinkInterval;
+        // Keep the same fish swimming — it just escaped, it's still nearby
     }
 
     /// <summary>
@@ -55,13 +61,20 @@ public class FishBiteDetector : MonoBehaviour
     {
         if (!active) return;
 
+        // Keep fish swimming toward current bob X
+        if (fishBlink != null && fishingLine != null)
+        {
+            fishBlink.SetTargetX(fishingLine.BobPosition.x);
+            fishingLine.LastBlinkPosition = fishInstance.transform.position;
+        }
+
         float speedMultiplier = 1f + proximityBonus;
         biteTimer -= Time.deltaTime * speedMultiplier;
 
         blinkTimer -= Time.deltaTime;
         if (blinkTimer <= 0f)
         {
-            SpawnBlink();
+            fishBlink?.Pulse();
             blinkTimer = blinkInterval + UnityEngine.Random.Range(-1f, 1f);
         }
 
@@ -72,21 +85,29 @@ public class FishBiteDetector : MonoBehaviour
         }
     }
 
-    private void SpawnBlink()
+    private void SpawnFish()
     {
-        if (fishBlinkPrefab == null) return;
-        if (fishingLine == null) return;
+        if (fishBlinkPrefab == null || fishingLine == null) return;
+        DestroyFish();
 
         Vector2 bobPos = fishingLine.BobPosition;
 
-        // Spawn further out from the bob so the fish has room to swim in
-        Vector2 spawnOffset = UnityEngine.Random.insideUnitCircle.normalized * blinkRadius;
-        Vector2 spawnPos = bobPos + spawnOffset;
+        // Spawn to one side of the bob at blinkRadius distance, same Y as the bob
+        float side = UnityEngine.Random.value > 0.5f ? 1f : -1f;
+        Vector2 spawnPos = new Vector2(bobPos.x + side * blinkRadius, bobPos.y);
 
-        GameObject blink = Instantiate(fishBlinkPrefab, spawnPos, Quaternion.identity);
-        blink.GetComponent<FishBlink>()?.Initialize(bobPos);
+        fishInstance = Instantiate(fishBlinkPrefab, spawnPos, Quaternion.identity);
+        fishBlink = fishInstance.GetComponent<FishBlink>();
+        fishBlink?.SetTargetX(bobPos.x);
+    }
 
-        // Tell FishingLine where this blink appeared so proximity can be calculated
-        fishingLine.LastBlinkPosition = spawnPos;
+    private void DestroyFish()
+    {
+        if (fishInstance != null)
+        {
+            Destroy(fishInstance);
+            fishInstance = null;
+            fishBlink = null;
+        }
     }
 }
