@@ -97,26 +97,30 @@ public class FishingController : MonoBehaviour
             EnterCharging();
     }
 
-    private void TryCast()
+    private void ExecuteCast(float charge)
     {
+        castChargeUI?.Hide();
+
         Vector3 screenPos = Mouse.current.position.ReadValue();
         screenPos.z = -Camera.main.transform.position.z;
         Vector2 mouseWorld = Camera.main.ScreenToWorldPoint(screenPos);
 
-        // Clamp to rod's cast distance
         Vector2 playerPos = transform.position;
-        Vector2 dir       = mouseWorld - playerPos;
-        float   maxDist   = ActiveRod != null ? ActiveRod.castDistance : 3f;
-        if (dir.magnitude > maxDist)
-            mouseWorld = playerPos + dir.normalized * maxDist;
+        Vector2 dir = mouseWorld - playerPos;
+        if (dir.sqrMagnitude < 0.0001f) dir = Vector2.right;
+        dir = dir.normalized;
 
-        Collider2D hit = Physics2D.OverlapPoint(mouseWorld, waterLayer);
-        if (hit == null) return;
+        float maxDist  = ActiveRod != null ? ActiveRod.castDistance : 3f;
+        float castDist = Mathf.Lerp(minCastDistance, maxDist, charge);
 
-        float speed = ActiveRod != null ? ActiveRod.castSpeed : 6f;
+        float baseSpeed = ActiveRod != null ? ActiveRod.castSpeed : 6f;
+        float castSpeed = Mathf.Lerp(baseSpeed, baseSpeed * maxSpeedMultiplier, charge);
+
+        Vector2 target = playerPos + dir * castDist;
+
         fishingLine.NudgeEnabled = false;
-        fishingLine.Cast(mouseWorld, speed, OnCastLanded);
-        state     = FishingState.Casting;
+        fishingLine.Cast(target, castSpeed, OnCastLanded);
+        state = FishingState.Casting;
         IsFishing = true;
         SoundEffectManager.Play("FishCast");
     }
@@ -131,6 +135,12 @@ public class FishingController : MonoBehaviour
 
     private void OnCastLanded()
     {
+        Collider2D hit = Physics2D.OverlapPoint(fishingLine.BobPosition, waterLayer);
+        if (hit == null)
+        {
+            CancelFishing();
+            return;
+        }
         fishingLine.NudgeEnabled = true;
         biteDetector.StartDetection();
         state = FishingState.Waiting;
