@@ -25,11 +25,19 @@ public class TugMinigame : MonoBehaviour
 
     [Header("Reel")]
     public float reelFillRate = 0.15f;
-    public float reelDrainRate = 0.05f;
+    public float reelDrainRate = 0.02f;
 
     [Header("Reaction Events")]
-    [Tooltip("Base reaction window in seconds at rarity 1. Scales down with rarity.")]
+    [Tooltip("Dart reaction window in seconds at rarity 1. Scales down with rarity.")]
     public float baseReactionWindow = 1.2f;
+    [Tooltip("Tug spam window in seconds at rarity 1. Scales down with rarity.")]
+    public float baseTugWindow = 3f;
+    [Tooltip("Reel progress lost on a missed Dart event or a Tug event with zero clicks")]
+    public float eventMissPenalty = 0.15f;
+    [Tooltip("Reel progress gained per click during a Tug event")]
+    public float reelPerTugClick = 0.02f;
+    [Tooltip("Reel progress gained on a successful Dart event")]
+    public float dartHitBoost = 0.08f;
 
     public float Tension      { get; private set; }
     public float ReelProgress { get; private set; }
@@ -41,11 +49,13 @@ public class TugMinigame : MonoBehaviour
 
     public event Action OnCatch;
     public event Action OnEscape;
+    public event Action<EventType> OnEventFailed;
 
     private float dangerTimer;
     private float slackTimer;
     private float currentDangerTime;
     private bool  active;
+    private int   tugClickCount;
 
     // Phase state
     private FishData currentFish;
@@ -102,18 +112,25 @@ public class TugMinigame : MonoBehaviour
     {
         if (!active) return;
 
-        // Tension
-        if (holdingButton)
-            Tension = Mathf.Clamp01(Tension + tensionRiseRate * Time.deltaTime);
-        else
-            Tension = Mathf.Clamp01(Tension - tensionFallRate * Time.deltaTime);
+        // Tension — frozen while any reaction event is active (LMB disabled)
+        if (ActiveEvent == null)
+        {
+            if (holdingButton)
+                Tension = Mathf.Clamp01(Tension + tensionRiseRate * Time.deltaTime);
+            else
+                Tension = Mathf.Clamp01(Tension - tensionFallRate * Time.deltaTime);
+        }
 
         bool inSweet  = Tension >= sweetMin && Tension <= sweetMax;
         bool inDanger = Tension > dangerThreshold;
         bool inSlack  = Tension < sweetMin;
 
-        // Reel progress
-        if (inSweet)
+        // Reel progress — always drains during any reaction event
+        if (ActiveEvent != null)
+        {
+            ReelProgress = Mathf.Clamp01(ReelProgress - reelDrainRate * Time.deltaTime);
+        }
+        else if (inSweet)
         {
             ReelProgress = Mathf.Clamp01(ReelProgress + reelFillRate * Time.deltaTime);
             if (ReelProgress >= 1f)
@@ -216,31 +233,51 @@ public class TugMinigame : MonoBehaviour
             }
             else if (ActiveEvent == EventType.Tug)
             {
+                // Each click slowly fights the fish and gains reel progress
                 if (lmbJustPressed)
                 {
-                    resolved = true; hit = true;
+                    ReelProgress = Mathf.Clamp01(ReelProgress + reelPerTugClick);
+                    tugClickCount++;
+                    if (ReelProgress >= 1f)
+                    {
+                        active = false;
+                        ActiveEvent = null;
+                        OnCatch?.Invoke();
+                        return;
+                    }
                 }
             }
 
             eventWindowTimer -= Time.deltaTime;
             if (eventWindowTimer <= 0f && !resolved)
             {
-                resolved = true; hit = false;
+                resolved = true;
+                hit = tugClickCount > 0;
             }
 
             if (resolved)
             {
-                if (hit)
+                EventType failedType = ActiveEvent.Value;
+
+                if (ActiveEvent == EventType.Dart)
                 {
-                    if (ActiveEvent == EventType.Dart)
-                        Tension = Mathf.Clamp01(Tension - 0.15f);
-                    else // Tug
-                        ReelProgress = Mathf.Clamp01(ReelProgress + 0.1f);
+                    if (hit)
+                        ReelProgress = Mathf.Clamp01(ReelProgress + dartHitBoost);
+                    else
+                    {
+                        ReelProgress = Mathf.Clamp01(ReelProgress - eventMissPenalty);
+                        OnEventFailed?.Invoke(failedType);
+                    }
                 }
-                else
+                else // Tug — penalise only if player didn't click at all
                 {
-                    Tension = Mathf.Clamp01(Tension + 0.2f);
+                    if (!hit)
+                    {
+                        ReelProgress = Mathf.Clamp01(ReelProgress - eventMissPenalty);
+                        OnEventFailed?.Invoke(failedType);
+                    }
                 }
+
                 ActiveEvent = null;
             }
         }
@@ -251,7 +288,8 @@ public class TugMinigame : MonoBehaviour
         EventType type = phase.possibleEvents[UnityEngine.Random.Range(0, phase.possibleEvents.Length)];
         ActiveEvent      = type;
         ActiveEventDir   = (type == EventType.Dart) ? (UnityEngine.Random.value > 0.5f ? 1 : -1) : 0;
-        eventWindowTimer = baseReactionWindow * rarityMult;
+        eventWindowTimer = (type == EventType.Tug ? baseTugWindow : baseReactionWindow) * rarityMult;
+        tugClickCount    = 0;
     }
 
     // rarity 1 = 1.0x, rarity 5 = 0.4x

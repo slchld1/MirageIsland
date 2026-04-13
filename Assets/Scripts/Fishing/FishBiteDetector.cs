@@ -12,21 +12,36 @@ public class FishBiteDetector : MonoBehaviour
     public float minWaitTime = 5f;
     public float maxWaitTime = 20f;
 
+    [Header("Water")]
+    [Tooltip("Padding from all edges of the water collider — fish will only spawn inside this boundary")]
+    public float shoreMargin = 1f;
+
     [Header("Fish Blink")]
     public GameObject fishBlinkPrefab;
     public float blinkInterval = 4f;
+    [Tooltip("How far away the fish spawns normally")]
+    public float spawnRadius = 5f;
+    [Tooltip("Close spawn distance — only used when closeSpawnChance triggers")]
     public float blinkRadius = 1.5f;
+    [Tooltip("0–1 chance the fish spawns close to the bob instead of far away")]
+    public float closeSpawnChance = 0.1f;
+    [Tooltip("Seconds after cast before the fish first appears")]
+    public float firstSpawnDelay = 2f;
 
     public event Action OnBite;
 
     private FishingLine fishingLine;
+    private LayerMask   waterLayer;
     private float biteTimer;
     private float blinkTimer;
+    private float spawnDelayTimer;
     private bool active;
 
     private void Awake()
     {
         fishingLine = GetComponent<FishingLine>();
+        var controller = GetComponent<FishingController>();
+        if (controller != null) waterLayer = controller.waterLayer;
     }
 
     private GameObject fishInstance;
@@ -37,7 +52,8 @@ public class FishBiteDetector : MonoBehaviour
         active = true;
         biteTimer = UnityEngine.Random.Range(minWaitTime, maxWaitTime);
         blinkTimer = blinkInterval;
-        SpawnFish();
+        spawnDelayTimer = firstSpawnDelay;
+        DestroyFish(); // clear any leftover fish
     }
 
     public void StopDetection()
@@ -61,10 +77,20 @@ public class FishBiteDetector : MonoBehaviour
     {
         if (!active) return;
 
-        // Keep fish swimming toward current bob X
+        // Wait before spawning fish — gives the feel of a fish noticing the bobber and approaching
+        if (fishInstance == null)
+        {
+            spawnDelayTimer -= Time.deltaTime;
+            if (spawnDelayTimer <= 0f)
+                SpawnFish();
+            else
+                return; // don't tick bite or blink until fish is in the water
+        }
+
+        // Keep fish swimming toward current bob position
         if (fishBlink != null && fishingLine != null)
         {
-            fishBlink.SetTargetX(fishingLine.BobPosition.x);
+            fishBlink.SetTarget(fishingLine.BobPosition);
             fishingLine.LastBlinkPosition = fishInstance.transform.position;
         }
 
@@ -92,13 +118,38 @@ public class FishBiteDetector : MonoBehaviour
 
         Vector2 bobPos = fishingLine.BobPosition;
 
-        // Spawn to one side of the bob at blinkRadius distance, same Y as the bob
-        float side = UnityEngine.Random.value > 0.5f ? 1f : -1f;
-        Vector2 spawnPos = new Vector2(bobPos.x + side * blinkRadius, bobPos.y);
+        float dist = UnityEngine.Random.value < closeSpawnChance ? blinkRadius : spawnRadius;
+        Collider2D waterCol = Physics2D.OverlapPoint(bobPos, waterLayer);
+
+        Vector2 spawnPos = bobPos;
+        Vector2 bestFallback = bobPos;
+        bool foundIdeal = false;
+
+        for (int i = 0; i < 16; i++)
+        {
+            float angle = UnityEngine.Random.Range(0f, 360f) * Mathf.Deg2Rad;
+            Vector2 candidate = new Vector2(
+                bobPos.x + Mathf.Cos(angle) * dist,
+                bobPos.y + Mathf.Sin(angle) * dist
+            );
+
+            if (waterCol == null || !waterCol.OverlapPoint(candidate)) continue;
+
+            // Save any in-water position as a fallback
+            bestFallback = candidate;
+
+            // Ideal: also inside the shoreMargin boundary
+            Bounds b = waterCol.bounds;
+            bool safeX = candidate.x > b.min.x + shoreMargin && candidate.x < b.max.x - shoreMargin;
+            bool safeY = candidate.y > b.min.y + shoreMargin && candidate.y < b.max.y - shoreMargin;
+            if (safeX && safeY) { spawnPos = candidate; foundIdeal = true; break; }
+        }
+
+        if (!foundIdeal) spawnPos = bestFallback;
 
         fishInstance = Instantiate(fishBlinkPrefab, spawnPos, Quaternion.identity);
         fishBlink = fishInstance.GetComponent<FishBlink>();
-        fishBlink?.SetTargetX(bobPos.x);
+        fishBlink?.SetTarget(bobPos);
     }
 
     private void DestroyFish()
