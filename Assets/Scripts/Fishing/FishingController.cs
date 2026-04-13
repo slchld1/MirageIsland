@@ -94,7 +94,16 @@ public class FishingController : MonoBehaviour
         if (ActiveRod == null) return;
 
         if (Mouse.current.leftButton.wasPressedThisFrame)
-            TryCast();
+            EnterCharging();
+    }
+
+    private void EnterCharging()
+    {
+        chargeLevel = 0f;
+        chargeDir   = 1f;
+        state       = FishingState.Charging;
+        IsFishing   = true;
+        castChargeUI?.Show();
     }
 
     private void TryCast()
@@ -153,7 +162,29 @@ public class FishingController : MonoBehaviour
 
     // ── Charging ──────────────────────────────────────────────────────────────
 
-    private void UpdateCharging() { }
+    private void UpdateCharging()
+    {
+        // Cancel on RMB
+        if (Mouse.current.rightButton.wasPressedThisFrame)
+        {
+            castChargeUI?.Hide();
+            state     = FishingState.Idle;
+            IsFishing = false;
+            ActiveRod = null;
+            return;
+        }
+
+        // Oscillate charge 0 → 1 → 0 → ...
+        chargeLevel += chargeDir * chargeRate * Time.deltaTime;
+        if (chargeLevel >= 1f) { chargeLevel = 1f; chargeDir = -1f; }
+        else if (chargeLevel <= 0f) { chargeLevel = 0f; chargeDir =  1f; }
+
+        castChargeUI?.OnChargeChanged(chargeLevel);
+
+        // Fire on LMB release
+        if (Mouse.current.leftButton.wasReleasedThisFrame)
+            ExecuteCast(chargeLevel);
+    }
 
     // ── Minigame ──────────────────────────────────────────────────────────────
 
