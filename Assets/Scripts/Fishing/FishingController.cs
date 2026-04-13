@@ -97,15 +97,6 @@ public class FishingController : MonoBehaviour
             EnterCharging();
     }
 
-    private void EnterCharging()
-    {
-        chargeLevel = 0f;
-        chargeDir   = 1f;
-        state       = FishingState.Charging;
-        IsFishing   = true;
-        castChargeUI?.Show();
-    }
-
     private void TryCast()
     {
         Vector3 screenPos = Mouse.current.position.ReadValue();
@@ -162,15 +153,22 @@ public class FishingController : MonoBehaviour
 
     // ── Charging ──────────────────────────────────────────────────────────────
 
+    private void EnterCharging()
+    {
+        chargeLevel = 0f;
+        chargeDir   = 1f;
+        state       = FishingState.Charging;
+        IsFishing   = true;
+        castChargeUI?.Show();
+    }
+
     private void UpdateCharging()
     {
         // Cancel on RMB
         if (Mouse.current.rightButton.wasPressedThisFrame)
         {
             castChargeUI?.Hide();
-            state     = FishingState.Idle;
-            IsFishing = false;
-            ActiveRod = null;
+            CancelFishing();
             return;
         }
 
