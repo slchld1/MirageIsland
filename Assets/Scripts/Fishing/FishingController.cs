@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public enum FishingState { Idle, Casting, Waiting, Minigame }
+public enum FishingState { Idle, Charging, Casting, Waiting, Minigame }
 
 /// <summary>
 /// State machine: Idle → Casting → Waiting → Minigame → back.
@@ -29,6 +29,20 @@ public class FishingController : MonoBehaviour
 
     private FishingState state     = FishingState.Idle;
     private FishData     rolledFish;
+
+    [Header("Cast Charge")]
+    [Tooltip("Shortest cast distance at zero charge (world units)")]
+    public float minCastDistance = 0.5f;
+    [Tooltip("Oscillation speed — full cycles (0→1→0) per second")]
+    public float chargeRate = 0.8f;
+    [Tooltip("Cast speed multiplier at full charge, relative to rod.castSpeed")]
+    public float maxSpeedMultiplier = 1.5f;
+    [SerializeField] private CastChargeUI castChargeUI;
+
+    private float chargeLevel;
+    private float chargeDir = 1f;
+
+    public float ChargeLevel => chargeLevel;
 
     private void Awake()
     {
@@ -66,6 +80,7 @@ public class FishingController : MonoBehaviour
         switch (state)
         {
             case FishingState.Idle:     UpdateIdle();     break;
+            case FishingState.Charging: UpdateCharging(); break;
             case FishingState.Casting:  UpdateCasting();  break;
             case FishingState.Waiting:  UpdateWaiting();  break;
             case FishingState.Minigame: UpdateMinigame(); break;
