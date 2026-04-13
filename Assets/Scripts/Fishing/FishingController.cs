@@ -121,7 +121,6 @@ public class FishingController : MonoBehaviour
         fishingLine.NudgeEnabled = false;
         fishingLine.Cast(target, castSpeed, OnCastLanded);
         state = FishingState.Casting;
-        IsFishing = true;
         SoundEffectManager.Play("FishCast");
     }
 
@@ -177,7 +176,6 @@ public class FishingController : MonoBehaviour
         // Cancel on RMB
         if (Mouse.current.rightButton.wasPressedThisFrame)
         {
-            castChargeUI?.Hide();
             CancelFishing();
             return;
         }
@@ -262,6 +260,7 @@ public class FishingController : MonoBehaviour
 
     private void CancelFishing()
     {
+        castChargeUI?.Hide();
         fishingLine.Hide();
         fishingLine.NudgeEnabled = true;
         biteDetector.StopDetection();
