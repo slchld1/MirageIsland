@@ -17,7 +17,17 @@ public class FishingController : MonoBehaviour
     [Tooltip("Set to the 'Water' layer in Project Settings")]
     public LayerMask waterLayer;
 
+    [Header("Cast Charge")]
+    [Tooltip("Shortest cast distance at zero charge (world units)")]
+    public float minCastDistance = 0.5f;
+    [Tooltip("Oscillation speed — full cycles (0→1→0) per second")]
+    public float chargeRate = 0.8f;
+    [Tooltip("Cast speed multiplier at full charge, relative to rod.castSpeed")]
+    public float maxSpeedMultiplier = 1.5f;
+    [SerializeField] private CastChargeUI castChargeUI;
+
     public FishingRod ActiveRod { get; private set; }
+    public float ChargeLevel => chargeLevel;
 
     private HotbarController hotbarController;
     private Inventory         inventory;
@@ -29,20 +39,8 @@ public class FishingController : MonoBehaviour
 
     private FishingState state     = FishingState.Idle;
     private FishData     rolledFish;
-
-    [Header("Cast Charge")]
-    [Tooltip("Shortest cast distance at zero charge (world units)")]
-    public float minCastDistance = 0.5f;
-    [Tooltip("Oscillation speed — full cycles (0→1→0) per second")]
-    public float chargeRate = 0.8f;
-    [Tooltip("Cast speed multiplier at full charge, relative to rod.castSpeed")]
-    public float maxSpeedMultiplier = 1.5f;
-    [SerializeField] private CastChargeUI castChargeUI;
-
     private float chargeLevel;
     private float chargeDir = 1f;
-
-    public float ChargeLevel => chargeLevel;
 
     private void Awake()
     {
@@ -152,6 +150,10 @@ public class FishingController : MonoBehaviour
         float proximityBonus = fishingLine.GetProximityBonus();
         biteDetector.Tick(proximityBonus);
     }
+
+    // ── Charging ──────────────────────────────────────────────────────────────
+
+    private void UpdateCharging() { }
 
     // ── Minigame ──────────────────────────────────────────────────────────────
 
