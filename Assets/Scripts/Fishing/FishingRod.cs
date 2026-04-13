@@ -5,6 +5,10 @@ public class FishingRod : Item
     [Range(1, 3)]
     public int rodTier = 1;
 
+    [Header("Rod Tip")]
+    [Tooltip("Offset from the HoldPoint to the tip of this rod (world units)")]
+    public Vector2 tipOffset = new Vector2(0.2f, 0.3f);
+
     [Header("Cast")]
     [Tooltip("Max distance the bobber can land from the player (world units)")]
     public float castDistance = 3f;

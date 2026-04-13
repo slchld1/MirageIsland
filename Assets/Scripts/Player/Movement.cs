@@ -6,6 +6,8 @@ public class Movement : MonoBehaviour
 {
 
     Vector2 moveInput;
+    public Vector2 LastMoveInput { get; private set; } = Vector2.down;
+    public bool IsMoving { get; private set; }
 
     Rigidbody2D rb;
 
@@ -56,18 +58,19 @@ public class Movement : MonoBehaviour
             spriteRenderer.flipX = moveInput.x < 0;
         }
 
+        // Always keep animator pointing in last known direction so idle doesn't snap to default
+        animator.SetFloat("horizontal", LastMoveInput.x);
+        animator.SetFloat("vertical", LastMoveInput.y);
+
     }
 
     public void OnMove(InputAction.CallbackContext context)
     {
         moveInput = context.ReadValue<Vector2>();
 
-        if(moveInput.sqrMagnitude > 0.01f)
-        {
-        animator.SetFloat("horizontal", moveInput.x);
-
-        animator.SetFloat("vertical", moveInput.y);
-        }
+        IsMoving = moveInput.sqrMagnitude > 0.01f;
+        if (IsMoving)
+            LastMoveInput = moveInput;
 
 
 

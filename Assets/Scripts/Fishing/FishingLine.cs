@@ -21,11 +21,18 @@ public class FishingLine : MonoBehaviour
     public float maxProximityBonus = 0.2f;
     public float proximityRange = 2f;
 
+    [Header("Rod Tip")]
+    [Tooltip("The HoldPoint transform from HeldItemRenderer — line starts here + rod's tipOffset.")]
+    public Transform holdPoint;
+    [Tooltip("Fallback tip offset used when no rod is active. Also shown in the gizmo for tuning.")]
+    public Vector2 tipOffset = new Vector2(0.2f, 0.3f);
+
     [Header("Bobber")]
     [Tooltip("Prefab with a SpriteRenderer — sits at the end of the line in the water")]
     public GameObject bobberPrefab;
 
-    private LineRenderer lineRenderer;
+    private LineRenderer     lineRenderer;
+    private FishingController fishingController;
     private Vector2 castPoint;
     private Vector2 bobPosition;
     private GameObject bobberInstance;
@@ -38,7 +45,15 @@ public class FishingLine : MonoBehaviour
 
     private void Awake()
     {
-        lineRenderer = GetComponent<LineRenderer>();
+        lineRenderer      = GetComponent<LineRenderer>();
+        fishingController = GetComponent<FishingController>();
+
+        if (holdPoint == null)
+        {
+            HeldItemRenderer held = GetComponent<HeldItemRenderer>();
+            if (held != null) holdPoint = held.holdPoint;
+        }
+
         lineRenderer.positionCount = 2;
         lineRenderer.startWidth = 0.05f;
         lineRenderer.endWidth = 0.05f;
@@ -55,7 +70,7 @@ public class FishingLine : MonoBehaviour
     public void Cast(Vector2 castTarget, float speed, Action onLanded)
     {
         castPoint    = castTarget;
-        bobPosition  = transform.position; // start at player
+        bobPosition  = RodTipPosition; // start at rod tip
         LastBlinkPosition = castTarget;
         lineRenderer.enabled = true;
         SpawnBobber();
@@ -125,10 +140,25 @@ public class FishingLine : MonoBehaviour
         bobberInstance = Instantiate(bobberPrefab, bobPosition, Quaternion.identity);
     }
 
+    private Vector3 RodTipPosition
+    {
+        get
+        {
+            Vector3 origin = holdPoint != null ? holdPoint.position : transform.position;
+            return origin + (Vector3)tipOffset;
+        }
+    }
+
     private void UpdateLine()
     {
-        lineRenderer.SetPosition(0, transform.position);
+        lineRenderer.SetPosition(0, RodTipPosition);
         lineRenderer.SetPosition(1, bobPosition);
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawSphere(RodTipPosition, 0.05f);
     }
 
     public float GetProximityBonus()
