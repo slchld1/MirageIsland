@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 public enum FishingState { Idle, Charging, Casting, Waiting, Minigame }
 
 /// <summary>
-/// State machine: Idle → Casting → Waiting → Minigame → back.
+/// State machine: Idle → Charging → Casting → Waiting → Minigame → back.
 /// Attach to the Player GameObject alongside FishingLine, FishBiteDetector, TugMinigame.
 /// Requires a "Water" physics layer in Project Settings → Tags and Layers.
 /// </summary>
@@ -173,6 +173,13 @@ public class FishingController : MonoBehaviour
 
     private void UpdateCharging()
     {
+        // Guard against hotbar swap during charge
+        if (!(hotbarController.GetActiveItem() is FishingRod))
+        {
+            CancelFishing();
+            return;
+        }
+
         // Cancel on RMB
         if (Mouse.current.rightButton.wasPressedThisFrame)
         {
