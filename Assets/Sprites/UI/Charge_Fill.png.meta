@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: cd9687a6e4667694f94ff146af647e30
+guid: 7e1b1b51c48266d45a97560319121072
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3491547502832315832
-    second: LifeBarMiniUnder_0
+      213: -1946751193634255751
+    second: Charge_Fill_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,12 +100,12 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: LifeBarMiniUnder_0
+      name: Charge_Fill_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 18
+        width: 184
         height: 4
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 84217419b088b8fc0800000000000000
-      internalID: -3491547502832315832
+      spriteID: 97ccc5d8a10cbf4e0800000000000000
+      internalID: -1946751193634255751
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      LifeBarMiniUnder_0: -3491547502832315832
+      Charge_Fill_0: -1946751193634255751
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -60,6 +60,9 @@ TagManager:
   - name: Items
     uniqueID: 2245051063
     locked: 0
+  - name: ItemGuides
+    uniqueID: 3127756749
+    locked: 0
   - name: Decor
     uniqueID: 3974083521
     locked: 0
