@@ -13,7 +13,7 @@ public class TugMinigameUI : MonoBehaviour
 
     [Header("Bars")]
     [Tooltip("FillBarController on the TensionBar_Panel prefab")]
-    public FillBarController tensionBar;
+    [SerializeField] private FillBarController tensionBar;
     [Tooltip("Image with Image Type = Filled, Fill Method = Horizontal")]
     public Image reelFill;
 

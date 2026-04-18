@@ -14,6 +14,7 @@ public class FillBarController : MonoBehaviour
     [SerializeField] private RectTransform dangerZoneMarker;
 
     [Header("Settings")]
+    [Range(0f, 1f)]
     [Tooltip("Visual threshold (0-1) where the red danger overlay begins to appear")]
     public float dangerThreshold = 0.75f;
 
