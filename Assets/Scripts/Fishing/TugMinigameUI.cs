@@ -12,15 +12,10 @@ public class TugMinigameUI : MonoBehaviour
     public GameObject panel;
 
     [Header("Bars")]
-    [Tooltip("Image with Image Type = Filled, Fill Method = Vertical")]
-    public Image tensionFill;
+    [Tooltip("FillBarController on the TensionBar_Panel prefab")]
+    public FillBarController tensionBar;
     [Tooltip("Image with Image Type = Filled, Fill Method = Horizontal")]
     public Image reelFill;
-
-    [Header("Tension Colors")]
-    public Color safeColor    = Color.green;
-    public Color warningColor = Color.yellow;
-    public Color dangerColor  = Color.red;
 
     [Header("Event Prompts")]
     [Tooltip("GameObject shown during a Dart event. Should contain a Text child.")]
@@ -68,12 +63,8 @@ public class TugMinigameUI : MonoBehaviour
         if (tugMinigame == null) return;
 
         // Tension bar
-        float t = tugMinigame.Tension;
-        if (tensionFill != null)
-        {
-            tensionFill.fillAmount = t;
-            tensionFill.color = t > 0.8f ? dangerColor : t > 0.6f ? warningColor : safeColor;
-        }
+        if (tensionBar != null)
+            tensionBar.NormalizedValue = tugMinigame.Tension;
 
         // Reel bar
         if (reelFill != null)
