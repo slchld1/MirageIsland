@@ -8,26 +8,39 @@ using UnityEngine.UI;
 public class FillBarController : MonoBehaviour
 {
     [Header("References")]
-    public RectTransform fillBase;
-    public Image         fillDanger;
-    public RectTransform indicator;
-    public RectTransform dangerZoneMarker;
+    [SerializeField] private RectTransform fillBase;
+    [SerializeField] private Image         fillDanger;
+    [SerializeField] private RectTransform indicator;
+    [SerializeField] private RectTransform dangerZoneMarker;
 
     [Header("Settings")]
     [Tooltip("Visual threshold (0-1) where the red danger overlay begins to appear")]
     public float dangerThreshold = 0.75f;
 
     /// <summary>Single input. Set this each frame from your gameplay script (0-1).</summary>
-    public float NormalizedValue { get; set; }
+    private float _normalizedValue;
+
+    public float NormalizedValue
+    {
+        get => _normalizedValue;
+        set => _normalizedValue = Mathf.Clamp01(value);
+    }
 
     private float barWidth;
     private float indicatorX;
 
     private void Start()
     {
+        if (fillBase == null)
+        {
+            Debug.LogError("[FillBarController] fillBase is not assigned.", this);
+            enabled = false;
+            return;
+        }
+
         // barWidth comes from Fill_Container (fillBase's parent)
         barWidth   = ((RectTransform)fillBase.parent).rect.width;
-        indicatorX = 0f;
+        indicatorX = NormalizedValue * barWidth;
 
         // Position danger zone marker once — it never moves after this
         if (dangerZoneMarker != null)
@@ -48,9 +61,10 @@ public class FillBarController : MonoBehaviour
         // Fill_Danger — alpha lerps 0→1 above dangerThreshold
         if (fillDanger != null)
         {
-            float alpha = NormalizedValue < dangerThreshold
-                ? 0f
-                : (NormalizedValue - dangerThreshold) / (1f - dangerThreshold);
+            float range = 1f - dangerThreshold;
+            float alpha = (range > 0f && NormalizedValue >= dangerThreshold)
+                ? (NormalizedValue - dangerThreshold) / range
+                : 0f;
             Color c = fillDanger.color;
             c.a = alpha;
             fillDanger.color = c;
