@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Water Palette</title>
+<style>
+  body { background: #1a1a2e; color: #eee; font-family: sans-serif; margin: 0; padding: 24px; }
+  h2 { text-align:center; margin-bottom:4px; }
+  .sub { text-align:center; color:#aaa; margin-bottom:28px; font-size:.9em; }
+  .section { margin-bottom: 32px; }
+  h3 { margin: 0 0 12px; font-size:1em; color:#cef; border-bottom:1px solid #333; padding-bottom:6px; }
+  .swatches { display:flex; gap:10px; flex-wrap:wrap; }
+  .swatch { text-align:center; }
+  .color { width:72px; height:72px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); }
+  .hex { font-size:11px; color:#aaa; margin-top:4px; font-family:monospace; }
+  .name { font-size:10px; color:#888; }
+  .preview { height:80px; border-radius:10px; margin-bottom:8px; overflow:hidden; display:flex; }
+  .stripe { flex:1; }
+  .note { font-size:.82em; color:#888; margin-top:8px; }
+  .tag { display:inline-block; background:#2a3a2a; color:#8f8; font-size:10px; padding:2px 6px; border-radius:4px; margin-left:6px; }
+  .tag.bad { background:#3a2a2a; color:#f88; }
+</style>
+</head>
+<body>
+
+<h2>Water Palette Comparison</h2>
+<p class="sub">Your current palette vs. a Stardew Valley inspired palette</p>
+
+<div class="section">
+  <h3>Your current palette <span class="tag bad">too purple, disconnected</span></h3>
+  <div class="preview">
+    <div class="stripe" style="background:#7B7BBF"></div>
+    <div class="stripe" style="background:#9191C8"></div>
+    <div class="stripe" style="background:#A8C4D0"></div>
+    <div class="stripe" style="background:#C8E4EC"></div>
+    <div class="stripe" style="background:#E8F4F8"></div>
+  </div>
+  <div class="swatches">
+    <div class="swatch"><div class="color" style="background:#7B7BBF"></div><div class="hex">#7B7BBF</div><div class="name">Deep ocean</div></div>
+    <div class="swatch"><div class="color" style="background:#9191C8"></div><div class="hex">#9191C8</div><div class="name">Mid ocean</div></div>
+    <div class="swatch"><div class="color" style="background:#A8C4D0"></div><div class="hex">#A8C4D0</div><div class="name">Nearshore</div></div>
+    <div class="swatch"><div class="color" style="background:#C8E4EC"></div><div class="hex">#C8E4EC</div><div class="name">Shore</div></div>
+    <div class="swatch"><div class="color" style="background:#E8F4F8"></div><div class="hex">#E8F4F8</div><div class="name">Foam</div></div>
+  </div>
+  <p class="note">Deep ocean is purple-blue while nearshore is blue-green — they feel like different water bodies.</p>
+</div>
+
+<div class="section">
+  <h3>Stardew Valley inspired palette <span class="tag">warm teal family</span></h3>
+  <div class="preview">
+    <div class="stripe" style="background:#2E6B8A"></div>
+    <div class="stripe" style="background:#3D8FAD"></div>
+    <div class="stripe" style="background:#5AADCC"></div>
+    <div class="stripe" style="background:#82CBE0"></div>
+    <div class="stripe" style="background:#C2EAF5"></div>
+  </div>
+  <div class="swatches">
+    <div class="swatch"><div class="color" style="background:#2E6B8A"></div><div class="hex">#2E6B8A</div><div class="name">Deep ocean</div></div>
+    <div class="swatch"><div class="color" style="background:#3D8FAD"></div><div class="hex">#3D8FAD</div><div class="name">Mid ocean</div></div>
+    <div class="swatch"><div class="color" style="background:#5AADCC"></div><div class="hex">#5AADCC</div><div class="name">Nearshore</div></div>
+    <div class="swatch"><div class="color" style="background:#82CBE0"></div><div class="hex">#82CBE0</div><div class="name">Shore</div></div>
+    <div class="swatch"><div class="color" style="background:#C2EAF5"></div><div class="hex">#C2EAF5</div><div class="name">Foam</div></div>
+  </div>
+  <p class="note">All colors share the same blue-teal hue family. They get lighter AND slightly more cyan as they approach shore — like real shallow water.</p>
+</div>
+
+<div class="section">
+  <h3>Wave highlight colors (use sparingly on 1-2 pixels)</h3>
+  <div class="swatches">
+    <div class="swatch"><div class="color" style="background:#A8DFF0"></div><div class="hex">#A8DFF0</div><div class="name">Shimmer light</div></div>
+    <div class="swatch"><div class="color" style="background:#DAFAFF"></div><div class="hex">#DAFAFF</div><div class="name">Shimmer bright</div></div>
+    <div class="swatch"><div class="color" style="background:#FFFFFF"></div><div class="hex">#FFFFFF</div><div class="name">Foam white</div></div>
+    <div class="swatch"><div class="color" style="background:#1D4F6A"></div><div class="hex">#1D4F6A</div><div class="name">Wave shadow</div></div>
+  </div>
+</div>
+
+</body>
+</html>

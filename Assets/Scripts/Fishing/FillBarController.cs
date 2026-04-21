@@ -64,7 +64,7 @@ public class FillBarController : MonoBehaviour
         {
             float range = 1f - dangerThreshold;
             float alpha = (range > 0f && NormalizedValue >= dangerThreshold)
-                ? (NormalizedValue - dangerThreshold) / range
+                ? Mathf.Clamp01((NormalizedValue - dangerThreshold) / (range * 0.1f))
                 : 0f;
             Color c = fillDanger.color;
             c.a = alpha;

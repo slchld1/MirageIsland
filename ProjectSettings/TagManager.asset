@@ -48,6 +48,9 @@ TagManager:
   - name: Ground
     uniqueID: 4014710397
     locked: 0
+  - name: Shore
+    uniqueID: 587346329
+    locked: 0
   - name: Water
     uniqueID: 1677736357
     locked: 0
