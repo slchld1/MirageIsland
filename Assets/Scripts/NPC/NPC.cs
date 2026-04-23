@@ -13,6 +13,8 @@ public class NPC : MonoBehaviour, IInteractable
     private int dialogueIndex;
     private bool isTyping, isDialogueActive;
 
+    public string InteractionPrompt => throw new System.NotImplementedException();
+
     public bool CanInteract()
     {
         return !isDialogueActive;
@@ -27,11 +29,11 @@ public class NPC : MonoBehaviour, IInteractable
 
         if(isDialogueActive)
         {
-
+            NextLine();
         }
         else
         {
-
+            StartDialogue();
         }
     }
     
@@ -40,12 +42,33 @@ public class NPC : MonoBehaviour, IInteractable
         isDialogueActive = true;
         dialogueIndex = 0;
 
-        nameText.SetText(dialogueData.name);
+        nameText.SetText(dialogueData.npcName);
         portraitImage.sprite = dialogueData.npcPortrait;
 
         dialoguePanel.SetActive(true);
         PauseController.SetPause(true);
-        
+
+        StartCoroutine(TypeLine());
+    }
+    void NextLine()
+    {
+        if (isTyping)
+        {
+            //Skip typing animation and show the full line
+            StopAllCoroutines();
+            dialogueText.SetText(dialogueData.dialogueLines[dialogueIndex]);
+            isTyping = false;
+        }
+        else if(++dialogueIndex < dialogueData.dialogueLines.Length)
+        {
+            //If another line, type next line
+            StartCoroutine(TypeLine());
+        }
+        else
+        {
+            EndDialogue();
+        }
+
     }
 
     IEnumerator TypeLine()
@@ -56,6 +79,7 @@ public class NPC : MonoBehaviour, IInteractable
         foreach(char letter in dialogueData.dialogueLines[dialogueIndex])
         {
             dialogueText.text += letter;
+            SoundEffectManager.PlayVoice(dialogueData.voiceSound, dialogueData.voicePitch);
             yield return new WaitForSeconds(dialogueData.typingSpeed);
         }
 
@@ -64,6 +88,16 @@ public class NPC : MonoBehaviour, IInteractable
         if(dialogueData.autoProgressLines.Length > dialogueIndex && dialogueData.autoProgressLines[dialogueIndex])
         {
             yield return new WaitForSeconds(dialogueData.autoProgressDelay);
+            NextLine();
         }
+    }
+
+    public void EndDialogue()
+    {
+        StopAllCoroutines();
+        isDialogueActive = false;
+        dialogueText.SetText("");
+        dialoguePanel.SetActive(false);
+        PauseController.SetPause(false);
     }
 }

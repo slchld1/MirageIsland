@@ -11,6 +11,10 @@ public class TugMinigameUI : MonoBehaviour
     [Header("Panel")]
     public GameObject panel;
 
+    [Header("Follow Player")]
+    [SerializeField] private Transform playerTransform;
+    [SerializeField] private Vector2 headOffset = new Vector2(0f, 1.5f);
+
     [Header("Bars")]
     [Tooltip("FillBarController on the TensionBar_Panel prefab")]
     [SerializeField] private FillBarController tensionBar;
@@ -34,12 +38,19 @@ public class TugMinigameUI : MonoBehaviour
     private TugMinigame tugMinigame;
     private bool flashingDart;
     private bool flashingTug;
+    private Canvas rootCanvas;
+    private RectTransform panelRect;
 
     private void Awake()
     {
         tugMinigame = FindAnyObjectByType<TugMinigame>();
         if (tugMinigame == null) Debug.LogError("[TugMinigameUI] TugMinigame not found in scene.", this);
-        if (panel != null) panel.SetActive(false);
+        if (panel != null)
+        {
+            panel.SetActive(false);
+            panelRect = panel.GetComponent<RectTransform>();
+        }
+        rootCanvas = GetComponentInParent<Canvas>();
     }
 
     private void Start()
@@ -57,10 +68,23 @@ public class TugMinigameUI : MonoBehaviour
     public void Show() { if (panel != null) panel.SetActive(true); }
     public void Hide() { if (panel != null) panel.SetActive(false); }
 
+    private void PositionPanel()
+    {
+        if (playerTransform == null || panelRect == null || rootCanvas == null) return;
+        Vector3 worldPos = playerTransform.position + (Vector3)(headOffset);
+        Vector2 screenPos = Camera.main.WorldToScreenPoint(worldPos);
+        Camera uiCam = rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : rootCanvas.worldCamera;
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                rootCanvas.GetComponent<RectTransform>(), screenPos, uiCam, out Vector2 localPoint))
+            panelRect.localPosition = localPoint;
+    }
+
     private void Update()
     {
         if (panel == null || !panel.activeSelf) return;
         if (tugMinigame == null) return;
+
+        PositionPanel();
 
         // Tension bar
         if (tensionBar != null)
