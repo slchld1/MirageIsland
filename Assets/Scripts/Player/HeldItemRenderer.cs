@@ -61,10 +61,18 @@ public class HeldItemRenderer : MonoBehaviour
         lastSlotIndex = hotbarController.SelectedSlotIndex;
 
         Item activeItem = hotbarController.GetActiveItem();
+
         if (activeItem != null)
         {
-            Image icon = activeItem.GetComponent<Image>();
-            holdRenderer.sprite = icon != null ? icon.sprite : null;
+            if (activeItem is FishingRod rod && rod.heldSprite != null)
+            {
+                holdRenderer.sprite = rod.heldSprite;
+            }
+            else
+            {
+                Image icon = activeItem.GetComponent<Image>();
+                holdRenderer.sprite = icon != null ? icon.sprite : null;
+            }
             holdPoint.localScale = new Vector3(holdScale.x, holdScale.y, 1f);
         }
         else

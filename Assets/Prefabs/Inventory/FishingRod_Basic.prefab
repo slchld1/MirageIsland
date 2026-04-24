@@ -19,7 +19,7 @@ GameObject:
   - component: {fileID: 1392059317416058474}
   - component: {fileID: 2177127895924122503}
   m_Layer: 5
-  m_Name: BasicFishingRod
+  m_Name: FishingRod_Basic
   m_TagString: Item
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33,7 +33,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8159287903480405637}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -41,7 +41,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 1.681, y: 0.452}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7918719561932630323
@@ -72,7 +72,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 324cbbd7e207fc3438963e46c01e8c08, type: 3}
+  m_Sprite: {fileID: 21300000, guid: b2adb57dbbdc6e547a097318d6a093a4, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -123,8 +123,10 @@ MonoBehaviour:
   ID: 200001
   Name: Basic Fishing Rod
   rodTier: 1
+  tipOffset: {x: 0, y: 0.2}
   castDistance: 1
   castSpeed: 2
+  heldSprite: {fileID: 21300000, guid: f0e1399d570b46446a64fb3623758b92, type: 3}
   equippedBait: 0
   baitCount: 0
 --- !u!114 &-3970740043195146696
@@ -187,10 +189,10 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: -2049916233
-  m_SortingLayer: 6
+  m_SortingLayer: 7
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 324cbbd7e207fc3438963e46c01e8c08, type: 3}
+  m_Sprite: {fileID: 21300000, guid: b2adb57dbbdc6e547a097318d6a093a4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

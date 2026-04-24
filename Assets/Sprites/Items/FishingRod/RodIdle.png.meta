@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 324cbbd7e207fc3438963e46c01e8c08
+guid: f0e1399d570b46446a64fb3623758b92
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -6251451809504726511
-    second: Sprite_0
+      213: -7862551028592683613
+    second: RodIdle_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Sprite_0
+      name: RodIdle_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 7
-        height: 12
+        x: 9
+        y: 1
+        width: 14
+        height: 29
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 1127ffb63b16e39a0800000000000000
-      internalID: -6251451809504726511
+      spriteID: 3a5d9504f7b92e290800000000000000
+      internalID: -7862551028592683613
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Sprite_0: -6251451809504726511
+      RodIdle_0: -7862551028592683613
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
