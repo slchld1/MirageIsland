@@ -132,8 +132,8 @@ public class Tree : MonoBehaviour
         switch(state)
         {
             case TreeState.Seedling: mainRenderer.sprite = treeData.saplingSprite; break;
-            case TreeState.Mature: mainRenderer.sprite = treeData.matureSprite; break;
-            case TreeState.Ripe: mainRenderer.sprite = treeData.matureSprite; break;
+            case TreeState.Mature: mainRenderer.sprite = treeData.topSprite; break;
+            case TreeState.Ripe: mainRenderer.sprite = treeData.topSprite; break;
             case TreeState.Stump: mainRenderer.sprite = treeData.saplingSprite;  break;
         }
 
