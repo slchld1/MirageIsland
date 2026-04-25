@@ -28,6 +28,9 @@ public class Tree : MonoBehaviour
     [Header("Animator (assign in prefab")]
     public TreeAnimator animator;
 
+    [Header("Fall")]
+    public float fallAlignThreshold = 0.5f;
+
     private void Awake()
     {
         if (string.IsNullOrEmpty(treeID))
@@ -73,18 +76,30 @@ public class Tree : MonoBehaviour
         UpdateSprite();
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(int damage, Vector3 chopperWorldPos)
     {
         if (treeData == null || !treeData.isChoppable) return;
         if (state == TreeState.Seedling || state == TreeState.Stump) return;
 
+        int fallDir = ComputeFallDirection(chopperWorldPos);
+
         if (animator != null) animator.PlayShake();
 
         hpRemaining -= damage;
-        if (hpRemaining <= 0) Fell();
+        if (hpRemaining <= 0) Fell(fallDir);
     }
 
-    private void Fell()
+    private int ComputeFallDirection(Vector3 chopperWorldPos)
+    {
+        float dx = chopperWorldPos.x - transform.position.x;
+        if (Mathf.Abs(dx) < fallAlignThreshold)
+        {
+            return UnityEngine.Random.value < 0.5f ? -1 : 1;
+        }
+        return dx > 0f ? -1 : 1;
+    }
+
+    private void Fell(int fallDir)
     {
         DropWood();
         if (state == TreeState.Ripe) DropFruits();
