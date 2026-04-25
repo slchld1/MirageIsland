@@ -8,6 +8,7 @@ public class TreeData : ScriptableObject
     public string displayName;
 
     [Header("Chopping")]
+    public bool isChoppable = true;
     public int chopCount = 3;
     public int woodDropMin = 2;
     public int woodDropMax = 4;

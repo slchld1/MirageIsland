@@ -17,6 +17,8 @@ public class Tree : MonoBehaviour
     public bool wasPlanted = false;
     public string treeID;
     public float stateEnteredAtTotalHours;
+    public int hpRemaining;
+    public bool permanentlyGone;
 
     [Header("Renderers (assign in prefab)")]
     public SpriteRenderer mainRenderer;
@@ -24,10 +26,11 @@ public class Tree : MonoBehaviour
 
     private void Awake()
     {
-        if(string.IsNullOrEmpty(treeID))
+        if (string.IsNullOrEmpty(treeID))
         {
             treeID = GlobalHelper.GenerateUniqueId(gameObject);
         }
+        hpRemaining = treeData != null ? treeData.chopCount : 1;
         UpdateSprite();
     }
     private void Update()
@@ -59,11 +62,66 @@ public class Tree : MonoBehaviour
     private void Enter(TreeState next)
     {
         state = next;
-        if (DayCycleManager.Instance != null) 
+        if (DayCycleManager.Instance != null)
         {
             stateEnteredAtTotalHours = DayCycleManager.Instance.TotalHours;
         }
         UpdateSprite();
+    }
+
+    public void TakeDamage(int damage)
+    {
+        if (treeData == null || !treeData.isChoppable) return;
+        if (state == TreeState.Seedling || state == TreeState.Stump) return;
+
+        hpRemaining -= damage;
+        if (hpRemaining <= 0) Fell();
+    }
+
+    private void Fell()
+    {
+        DropWood();
+        if (state == TreeState.Ripe) DropFruits();
+
+        if(wasPlanted)
+        {
+            Destroy(gameObject);
+        }
+        else if (!treeData.regrows)
+        {
+            permanentlyGone = true;
+            Destroy(gameObject);
+        }
+        else
+        {
+            hpRemaining = treeData.chopCount;
+            Enter(TreeState.Stump);
+        }
+    }
+
+    private void DropWood()
+    {
+        if (treeData.woodItem == null) return;
+        int count = Random.Range(treeData.woodDropMin, treeData.woodDropMax + 1);
+        for (int i = 0; i < count; i++)
+        {
+            Vector3 offset = new Vector3(Random.Range(-0.3f, 0.3f), Random.Range(-0.3f, 0.3f), 0f);
+            GameObject drop = Instantiate(treeData.woodItem.gameObject, transform.position + offset, Quaternion.identity);
+            var bounce = drop.GetComponent<BounceEffect>();
+            if (bounce != null) bounce.StartBounce();
+        }
+    }
+
+    private void DropFruits()
+    {
+        if (treeData.fruitItem == null) return;
+        for (int i = 0;i < treeData.fruitPerHarvest;i++)
+        {
+            Vector3 offset = new Vector3(Random.Range(-0.3f, 0.3f), Random.Range(-0.3f, 0.3f), 0f);
+            GameObject drop = Instantiate(treeData.fruitItem.gameObject, transform.position + offset, Quaternion.identity);
+            var bounce = drop.GetComponent <BounceEffect>();
+            if (bounce != null) bounce.StartBounce();
+        }
     }
     
 
