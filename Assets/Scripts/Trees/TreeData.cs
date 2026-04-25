@@ -29,7 +29,8 @@ public class TreeData : ScriptableObject
 
     [Header("Sprites")]
     public Sprite saplingSprite;
-    public Sprite matureSprite;
+    public Sprite topSprite;
+    public Sprite stumpSprite;
     public Sprite fruitOverlay;
 
     [Header("Prefab")]
