@@ -50,6 +50,7 @@ public class TreeAnimator : MonoBehaviour
 
         // Phase 1: rotate
         float elapsed = 0f;
+        
         while (elapsed < fallRotateDuration)
         {
             float t = elapsed / fallRotateDuration;
@@ -68,7 +69,39 @@ public class TreeAnimator : MonoBehaviour
         topTransform.localEulerAngles = new Vector3(startEuler.x, startEuler.y, targetZ);
         if (!impactFired) onImpact?.Invoke(); // safety net
 
-        // Phase 2 + 3
+        // Phase 2: lie still
+        yield return new WaitForSeconds(fallLieDuration);
+
+        //Phase 3: fade
+        Color topStartColor = topRenderer != null ? topRenderer.color : Color.white;
+        Color fruitStartColor = fruitRenderer != null ? fruitRenderer.color : Color.white;
+        elapsed = 0f;
+        while (elapsed < fallFadeDuration)
+        {
+            float t = elapsed / fallFadeDuration;
+            float a = Mathf.Lerp(1f, 0f, t);
+            if (topRenderer != null)
+            {
+                Color c = topStartColor; c.a = a; topRenderer.color = c;
+            }
+            if (fruitRenderer != null && fruitRenderer.enabled)
+            {
+                Color c = fruitStartColor; c.a = a; fruitRenderer.color = c;
+            }
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        if (topRenderer != null)
+        {
+            topRenderer.enabled = false;
+            Color c = topStartColor; c.a = 1f; topRenderer.color = c;
+        }
+        if (fruitRenderer != null)
+        {
+            fruitRenderer.enabled = false;
+            Color c = fruitStartColor; c.a = 1f; fruitRenderer.color = c;
+        }
+        topTransform.localEulerAngles = new Vector3(startEuler.x, startEuler.y, 0f);
 
         onComplete?.Invoke();
     }
