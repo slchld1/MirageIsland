@@ -21,8 +21,12 @@ public class Tree : MonoBehaviour
     public bool permanentlyGone;
 
     [Header("Renderers (assign in prefab)")]
-    public SpriteRenderer mainRenderer;
+    public SpriteRenderer topRenderer;
+    public SpriteRenderer stumpRenderer;
     public SpriteRenderer fruitRenderer;
+
+    [Header("Animator (assign in prefab")]
+    public TreeAnimator animator;
 
     private void Awake()
     {
@@ -127,14 +131,43 @@ public class Tree : MonoBehaviour
 
     private void UpdateSprite()
     {
-        if (treeData == null || mainRenderer == null) return;
+        if (treeData == null) return;
 
         switch(state)
         {
-            case TreeState.Seedling: mainRenderer.sprite = treeData.saplingSprite; break;
-            case TreeState.Mature: mainRenderer.sprite = treeData.topSprite; break;
-            case TreeState.Ripe: mainRenderer.sprite = treeData.topSprite; break;
-            case TreeState.Stump: mainRenderer.sprite = treeData.saplingSprite;  break;
+            case TreeState.Seedling:
+                if (topRenderer != null)
+                {
+                    topRenderer.sprite = treeData.saplingSprite;
+                    topRenderer.enabled = true;
+                    Color c1 = topRenderer.color; c1.a = 1f; topRenderer.color = c1;
+                }
+                if (stumpRenderer != null) stumpRenderer.enabled = false;
+                break;
+
+            case TreeState.Mature:
+            case TreeState.Ripe:
+                if (topRenderer != null)
+                {
+                    topRenderer.sprite = treeData.topSprite;
+                    topRenderer.enabled = true;
+                    Color c2 = topRenderer.color; c2.a = 1f; topRenderer.color = c2;
+                }
+                if (stumpRenderer != null)
+                {
+                    stumpRenderer.sprite = treeData.stumpSprite;
+                    stumpRenderer.enabled = true;
+                }
+                break;
+
+            case TreeState.Stump:
+                if (topRenderer != null) topRenderer.enabled = false;
+                if (stumpRenderer != null)
+                {
+                    stumpRenderer.sprite = treeData.stumpSprite;
+                    stumpRenderer.enabled = true;
+                }
+                break;
         }
 
         if(fruitRenderer != null)

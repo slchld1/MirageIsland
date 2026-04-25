@@ -146,7 +146,8 @@ MonoBehaviour:
   stateEnteredAtTotalHours: 0
   hpRemaining: 0
   permanentlyGone: 0
-  mainRenderer: {fileID: 0}
+  topRenderer: {fileID: 8515449549174728760}
+  stumpRenderer: {fileID: 1061529513586945455}
   fruitRenderer: {fileID: 8811849957729681801}
 --- !u!61 &4262788143352713870
 BoxCollider2D:
@@ -182,7 +183,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.056022406, y: 1.0504203}
+  m_Offset: {x: -0.056022406, y: -0.29944593}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -192,7 +193,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.719888, y: 0.85994387}
+  m_Size: {x: 0.719888, y: 0.69058836}
   m_EdgeRadius: 0
 --- !u!210 &6852000762492620569
 SortingGroup:
