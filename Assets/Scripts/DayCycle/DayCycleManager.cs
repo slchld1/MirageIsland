@@ -14,9 +14,12 @@ public class DayCycleManager : MonoBehaviour
 
     // Fired when the phase changes (e.g. Day → Dusk)
     public static event Action<TimeOfDay> OnPhaseChanged;
-
+    [Header("GetCurrent")]
     public float CurrentHour { get; private set; }
     public TimeOfDay CurrentPhase { get; private set; }
+    public int CurrentDay { get; private set; }
+    public float TotalHours => CurrentDay * 24f + CurrentHour;
+
 
     private float elapsed;
     private TimeOfDay lastPhase;
@@ -38,7 +41,13 @@ public class DayCycleManager : MonoBehaviour
         if (PauseController.IsGamePaused) return;
 
         elapsed += Time.deltaTime;
-        if (elapsed >= realSecondsPerDay) elapsed -= realSecondsPerDay;
+        if (elapsed >= realSecondsPerDay)
+        {
+            elapsed -= realSecondsPerDay;
+            CurrentDay++;
+        }
+        
+        
 
         CurrentHour = (elapsed / realSecondsPerDay) * 24f;
 
@@ -58,6 +67,11 @@ public class DayCycleManager : MonoBehaviour
         CurrentHour = hour;
         CurrentPhase = GetPhase(hour);
         lastPhase = CurrentPhase;
+    }
+    public void SetTime(float hour, int day)
+    {
+        SetTime(hour);
+        CurrentDay = day;
     }
 
     // Returns 0-1 progress through the current phase (useful for smooth transitions)

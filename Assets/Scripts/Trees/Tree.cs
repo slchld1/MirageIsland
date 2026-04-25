@@ -16,6 +16,7 @@ public class Tree : MonoBehaviour
     public TreeState state = TreeState.Mature;
     public bool wasPlanted = false;
     public string treeID;
+    public float stateEnteredAtTotalHours;
 
     [Header("Renderers (assign in prefab)")]
     public SpriteRenderer mainRenderer;
@@ -29,6 +30,42 @@ public class Tree : MonoBehaviour
         }
         UpdateSprite();
     }
+    private void Update()
+    {
+        if (treeData == null || DayCycleManager.Instance == null) return;
+
+        if (stateEnteredAtTotalHours == 0f)
+        {
+            stateEnteredAtTotalHours = DayCycleManager.Instance.TotalHours;
+            return;
+        }
+
+        float elapsed = DayCycleManager.Instance.TotalHours - stateEnteredAtTotalHours;
+
+        switch (state)
+        {
+            case TreeState.Seedling:
+                if (elapsed >= treeData.growHours) Enter(TreeState.Mature);
+                break;
+            case TreeState.Mature:
+                if (treeData.fruitItem != null && elapsed >= treeData.ripenHours) Enter(TreeState.Ripe);
+                break;
+            case TreeState.Stump:
+                if (treeData.regrows && elapsed >= treeData.regrowHours) Enter(TreeState.Mature);
+                break;
+        }
+    }
+
+    private void Enter(TreeState next)
+    {
+        state = next;
+        if (DayCycleManager.Instance != null) 
+        {
+            stateEnteredAtTotalHours = DayCycleManager.Instance.TotalHours;
+        }
+        UpdateSprite();
+    }
+    
 
     private void UpdateSprite()
     {
