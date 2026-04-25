@@ -5,6 +5,7 @@ public class Item : MonoBehaviour
 {
     public int ID;
     public string Name;
+    public Sprite heldSprite;
 
     public virtual void UseItem()
     {

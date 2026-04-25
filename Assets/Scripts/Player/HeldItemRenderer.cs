@@ -64,9 +64,9 @@ public class HeldItemRenderer : MonoBehaviour
 
         if (activeItem != null)
         {
-            if (activeItem is FishingRod rod && rod.heldSprite != null)
+            if (activeItem.heldSprite != null)
             {
-                holdRenderer.sprite = rod.heldSprite;
+                holdRenderer.sprite = activeItem.heldSprite;
             }
             else
             {

@@ -15,11 +15,6 @@ public class FishingRod : Item
     [Tooltip("Units per second the bobber travels during the cast animation")]
     public float castSpeed = 6f;
 
-    [Header("HeldRenderer")]
-    [Tooltip("SpriteRenderer for Player when Item(tool) is held")]
-    public Sprite heldSprite;
-
-
     // Set by BaitSlotUI when bait is loaded
     [HideInInspector] public BaitType equippedBait = BaitType.None;
     [HideInInspector] public int baitCount = 0;
