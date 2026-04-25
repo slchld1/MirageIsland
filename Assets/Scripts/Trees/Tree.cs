@@ -87,6 +87,13 @@ public class Tree : MonoBehaviour
 
         if (animator != null) animator.PlayShake();
 
+        if (state == TreeState.Ripe)
+        {
+            DropFruits();
+            Enter(TreeState.Mature);
+            return;
+        }
+
         hpRemaining -= damage;
         if (hpRemaining <= 0) Fell(fallDir);
     }
