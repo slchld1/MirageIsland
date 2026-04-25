@@ -30,6 +30,8 @@ public class Tree : MonoBehaviour
 
     [Header("Fall")]
     public float fallAlignThreshold = 0.5f;
+    public float woodDropMinDistance = 1.2f;
+    public float woodDropMaxDistance = 2.0f;
 
     private void Awake()
     {
@@ -101,8 +103,7 @@ public class Tree : MonoBehaviour
 
     private void Fell(int fallDir)
     {
-        DropWood();
-        if (state == TreeState.Ripe) DropFruits();
+        DropWood(fallDir);
 
         if(wasPlanted)
         {
@@ -120,13 +121,15 @@ public class Tree : MonoBehaviour
         }
     }
 
-    private void DropWood()
+    private void DropWood(int fallDir)
     {
         if (treeData.woodItem == null) return;
         int count = Random.Range(treeData.woodDropMin, treeData.woodDropMax + 1);
         for (int i = 0; i < count; i++)
         {
-            Vector3 offset = new Vector3(Random.Range(-0.3f, 0.3f), Random.Range(-0.3f, 0.3f), 0f);
+            float xPush = fallDir * UnityEngine.Random.Range(woodDropMinDistance, woodDropMaxDistance);
+            float yJit = UnityEngine.Random.Range(-0.2f, 0.2f);
+            Vector3 offset = new Vector3(xPush, yJit, 0f);
             GameObject drop = Instantiate(treeData.woodItem.gameObject, transform.position + offset, Quaternion.identity);
             var bounce = drop.GetComponent<BounceEffect>();
             if (bounce != null) bounce.StartBounce();
