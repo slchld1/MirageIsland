@@ -28,10 +28,17 @@ public class Tree : MonoBehaviour
     [Header("Animator (assign in prefab")]
     public TreeAnimator animator;
 
+    [Header("Colliders (assign in prefab)")]
+    public Collider2D trunkCollider;
+
     [Header("Fall")]
     public float fallAlignThreshold = 0.5f;
     public float woodDropMinDistance = 1.2f;
     public float woodDropMaxDistance = 2.0f;
+
+    [Header("Guard Flag")]
+    private bool isFelling;
+
 
     private void Awake()
     {
@@ -76,10 +83,12 @@ public class Tree : MonoBehaviour
             stateEnteredAtTotalHours = DayCycleManager.Instance.TotalHours;
         }
         UpdateSprite();
+        if (trunkCollider != null) trunkCollider.enabled = (next != TreeState.Stump);
     }
 
     public void TakeDamage(int damage, Vector3 chopperWorldPos)
     {
+        if (isFelling) return;
         if (treeData == null || !treeData.isChoppable) return;
         if (state == TreeState.Seedling || state == TreeState.Stump) return;
 
@@ -108,24 +117,46 @@ public class Tree : MonoBehaviour
         return dx > 0f ? -1 : 1;
     }
 
+    private int pendingFallDir; // stashed for onFellComplete
     private void Fell(int fallDir)
     {
-        DropWood(fallDir);
+        isFelling = true;
+        pendingFallDir = fallDir;
 
-        if(wasPlanted)
+        if (trunkCollider != null) trunkCollider.enabled = false;
+
+        if (animator != null)
         {
-            Destroy(gameObject);
-        }
-        else if (!treeData.regrows)
-        {
-            permanentlyGone = true;
-            Destroy(gameObject);
+            animator.PlayFell(
+                fallDir,
+                onImpact: () => DropWood(pendingFallDir),
+                onComplete: OnFellComplete
+                );
         }
         else
         {
-            hpRemaining = treeData.chopCount;
-            Enter(TreeState.Stump);
+            DropWood(fallDir);
+            OnFellComplete();
         }
+    }
+
+
+    private void OnFellComplete()
+    {
+        isFelling = false;
+        if(wasPlanted)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        if (!treeData.regrows)
+        {
+            permanentlyGone = true;
+            Destroy(gameObject);
+            return;
+        }
+        hpRemaining = treeData.chopCount;
+        Enter(TreeState.Stump);
     }
 
     private void DropWood(int fallDir)
