@@ -10,6 +10,10 @@ public class PlayerToolDispatcher : MonoBehaviour
     [Header("Layers")]
     public LayerMask treeLayer;
 
+    [Header("Action Timing")]
+    public float chopCooldown = 0.4f;
+    public float nextChopAllowedAt = 0f;
+
     private void Update()
     {
         if (hotbar == null || cam == null) return;
@@ -25,8 +29,11 @@ public class PlayerToolDispatcher : MonoBehaviour
 
         if(active is Axe axe)
         {
+            if (Time.time < nextChopAllowedAt) return;
+
             Tree tree = FindTreeAt(world);
             if (tree != null) tree.TakeDamage(axe.damage, transform.position);
+            nextChopAllowedAt = Time.time + chopCooldown;
         }
         // PlantableSeed + fruit-pick branches added later
     }
