@@ -78,6 +78,8 @@ public class Tree : MonoBehaviour
         if (treeData == null || !treeData.isChoppable) return;
         if (state == TreeState.Seedling || state == TreeState.Stump) return;
 
+        if (animator != null) animator.PlayShake();
+
         hpRemaining -= damage;
         if (hpRemaining <= 0) Fell();
     }
