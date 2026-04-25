@@ -35,6 +35,43 @@ public class TreeAnimator : MonoBehaviour
         shakeRoutine = StartCoroutine(ShakeRoutine());
     }
 
+    public void PlayFell(int fallDir, Action onImpact, Action onComplete)
+    {
+        StartCoroutine(FellRoutine(fallDir, onImpact, onComplete));
+    }
+
+    private IEnumerator FellRoutine(int fallDir, Action onImpact, Action onComplete)
+    {
+        if (topTransform == null) { onComplete?.Invoke(); yield break; }
+
+        float targetZ = (fallDir == -1) ? +90f : -90f;
+        Vector3 startEuler = topTransform.localEulerAngles;
+        bool impactFired = false;
+
+        // Phase 1: rotate
+        float elapsed = 0f;
+        while (elapsed < fallRotateDuration)
+        {
+            float t = elapsed / fallRotateDuration;
+            float eased = t * t; //easeInQuad
+            topTransform.localEulerAngles = new Vector3(startEuler.x, startEuler.y, Mathf.Lerp(0f, targetZ, eased));
+
+            if (!impactFired && t >= fallImpactFraction)
+            {
+                impactFired = true;
+                onImpact?.Invoke();
+            }
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        topTransform.localEulerAngles = new Vector3(startEuler.x, startEuler.y, targetZ);
+        if (!impactFired) onImpact?.Invoke(); // safety net
+
+        // Phase 2 + 3
+
+        onComplete?.Invoke();
+    }
     private IEnumerator ShakeRoutine()
     {
         float elapsed = 0f;
