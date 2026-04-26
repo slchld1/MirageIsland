@@ -34,7 +34,7 @@ public class SaveController : MonoBehaviour
         {
             playerPosition = GameObject.FindWithTag("Player").transform.position,
             mapBoundary = FindAnyObjectByType<CinemachineConfiner>().m_BoundingShape2D.gameObject.name,
-            currentHour = DayCycleManager.Instance != null ? DayCycleManager.Instance.CurrentHour : 6f,
+            currentHour = DayCycleManager.Instance != null ? SnapTo5Min(DayCycleManager.Instance.CurrentHour) : 6f,
             inventorySaveData = inventoryController.GetInventoryItems(),
             hotbarSaveData = hotbarController.GetHotbarItems(),
             chestSaveData = GetChestState(),
@@ -111,5 +111,10 @@ public class SaveController : MonoBehaviour
                 chest.SetOpened(chestSaveData.isOpened);
             }
         }
+    }
+
+    private static float SnapTo5Min(float hour)
+    {
+        return Mathf.Floor(hour * 12f) / 12f;
     }
 }

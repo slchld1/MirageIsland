@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 115b40c2fca175c49a85b8c748f1a07d, type: 3}
+  m_Name: PalmTree
+  m_EditorClassIdentifier: Assembly-CSharp::TreeData
+  treeDataID: 2
+  displayName: PalmTree
+  isChoppable: 1
+  chopCount: 5
+  woodDropMin: 2
+  woodDropMax: 4
+  woodItem: {fileID: -3970740043195146696, guid: c83cf71ecf8468943a2331cf8d929017, type: 3}
+  fruitItem: {fileID: 0}
+  ripenHours: 48
+  fruitPerHarvest: 1
+  regrowHours: 1
+  regrows: 1
+  isPlantable: 0
+  growHours: 24
+  saplingSprite: {fileID: 21300000, guid: 4242ca968b605144f89cbeedb7a87c6b, type: 3}
+  topSprite: {fileID: 21300000, guid: 7131195273f281e4e917eb845e3f72d2, type: 3}
+  stumpSprite: {fileID: 21300000, guid: 4242ca968b605144f89cbeedb7a87c6b, type: 3}
+  fruitOverlay: {fileID: 0}
+  treePrefab: {fileID: 2916169303407270878, guid: dfccca6e006d1674daa072cd2d1a5cdf, type: 3}

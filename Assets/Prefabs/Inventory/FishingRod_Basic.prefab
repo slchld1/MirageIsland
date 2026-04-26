@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 8290542809247495265}
   - component: {fileID: -3827700119873034715}
   - component: {fileID: -3001666894409115195}
-  - component: {fileID: -3970740043195146696}
   - component: {fileID: 7227904567938389395}
   - component: {fileID: 1392059317416058474}
   - component: {fileID: 2177127895924122503}
@@ -129,20 +128,6 @@ MonoBehaviour:
   heldSprite: {fileID: 21300000, guid: f0e1399d570b46446a64fb3623758b92, type: 3}
   equippedBait: 0
   baitCount: 0
---- !u!114 &-3970740043195146696
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8159287903480405637}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 294fcddc3df33c14bb4e2c3feee5eae4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
-  ID: 3
-  Name: BasicRod
 --- !u!212 &7227904567938389395
 SpriteRenderer:
   serializedVersion: 2
