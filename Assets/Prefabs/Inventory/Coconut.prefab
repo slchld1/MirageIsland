@@ -13,12 +13,13 @@ GameObject:
   - component: {fileID: 3141407878039508362}
   - component: {fileID: 8290542809247495265}
   - component: {fileID: -3827700119873034715}
+  - component: {fileID: -3970740043195146696}
   - component: {fileID: 7227904567938389395}
   - component: {fileID: 1392059317416058474}
   - component: {fileID: 2177127895924122503}
-  - component: {fileID: 180051897919190250}
+  - component: {fileID: -6735705883362366382}
   m_Layer: 5
-  m_Name: Axe_Basic
+  m_Name: Coconut
   m_TagString: Item
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32,15 +33,15 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8159287903480405637}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 1.681, y: 0.452}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7918719561932630323
@@ -71,7 +72,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 932c19397aa0a52429713e8a24d37fe8, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 0a15eaaeff8f4db4dbc0a2ac3c8b3fd9, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -107,6 +108,21 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &-3970740043195146696
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8159287903480405637}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 294fcddc3df33c14bb4e2c3feee5eae4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  ID: 400001
+  Name: Coconut
+  heldSprite: {fileID: 0}
 --- !u!212 &7227904567938389395
 SpriteRenderer:
   serializedVersion: 2
@@ -152,16 +168,16 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: -1178810193
-  m_SortingLayer: 6
+  m_SortingLayerID: -2049916233
+  m_SortingLayer: 7
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 932c19397aa0a52429713e8a24d37fe8, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 0a15eaaeff8f4db4dbc0a2ac3c8b3fd9, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.4375, y: 0.75}
+  m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -178,8 +194,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a80a390032f53f4e9d3fb12bd9dc0d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BounceEffect
-  bounceHeight: 0.3
-  bounceDuration: 0.4
+  bounceHeight: 1
+  bounceDuration: 0.6
   bounceCount: 2
 --- !u!58 &2177127895924122503
 CircleCollider2D:
@@ -215,9 +231,9 @@ CircleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_Radius: 0.5
---- !u!114 &180051897919190250
+  m_Offset: {x: -0.0063171387, y: -0.5077362}
+  m_Radius: 0.4280243
+--- !u!114 &-6735705883362366382
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -226,10 +242,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 8159287903480405637}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: afd545e0a0b578d49be626bcea8d2c60, type: 3}
+  m_Script: {fileID: 11500000, guid: 7f20473e859981440b1eec55eb890c5a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Axe
-  ID: 300001
-  Name: Basic Axe
-  heldSprite: {fileID: 0}
-  damage: 1
+  m_EditorClassIdentifier: Assembly-CSharp::PickupDelay
+  delaySeconds: 0.5
+  pickupCollider: {fileID: 2177127895924122503}

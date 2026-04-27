@@ -121,11 +121,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FishingRod
   ID: 200001
   Name: Basic Fishing Rod
+  heldSprite: {fileID: 21300000, guid: f0e1399d570b46446a64fb3623758b92, type: 3}
   rodTier: 1
   tipOffset: {x: 0, y: 0.2}
   castDistance: 1
   castSpeed: 2
-  heldSprite: {fileID: 21300000, guid: f0e1399d570b46446a64fb3623758b92, type: 3}
   equippedBait: 0
   baitCount: 0
 --- !u!212 &7227904567938389395
@@ -173,8 +173,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: -2049916233
-  m_SortingLayer: 7
+  m_SortingLayerID: -1178810193
+  m_SortingLayer: 6
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: b2adb57dbbdc6e547a097318d6a093a4, type: 3}
@@ -186,7 +186,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!114 &1392059317416058474
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -19,9 +19,12 @@ MonoBehaviour:
   woodDropMin: 2
   woodDropMax: 4
   woodItem: {fileID: -3970740043195146696, guid: c83cf71ecf8468943a2331cf8d929017, type: 3}
-  fruitItem: {fileID: 0}
-  ripenHours: 48
-  fruitPerHarvest: 1
+  fruitItem: {fileID: -3970740043195146696, guid: 72152adc39dc9c440ae2ef05614702dd, type: 3}
+  maxFruitCount: 3
+  yieldPerPick: 1
+  matureCooldownHours: 1
+  fruitGrowMinHours: 0
+  fruitGrowMaxHours: 1
   regrowHours: 1
   regrows: 1
   isPlantable: 0
@@ -29,5 +32,4 @@ MonoBehaviour:
   saplingSprite: {fileID: 21300000, guid: 4242ca968b605144f89cbeedb7a87c6b, type: 3}
   topSprite: {fileID: 21300000, guid: 7131195273f281e4e917eb845e3f72d2, type: 3}
   stumpSprite: {fileID: 21300000, guid: 4242ca968b605144f89cbeedb7a87c6b, type: 3}
-  fruitOverlay: {fileID: 0}
-  treePrefab: {fileID: 2916169303407270878, guid: dfccca6e006d1674daa072cd2d1a5cdf, type: 3}
+  treePrefab: {fileID: 2916169303407270878, guid: 36a955dd85b7f684db3d2a5348d9c49f, type: 3}

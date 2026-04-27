@@ -12,21 +12,26 @@ public class PlayerItemCollector : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.CompareTag("Item"))
-        {
-            Item item = collision.GetComponent<Item>();
-            if(item != null)
-            {
-                //Add to inventory
-                bool itemAdded = inventoryController.AddItem(collision.gameObject);
+        if (!collision.CompareTag("Item")) return;
 
-                if(itemAdded)
-                {
-                    item.PickUp();
-                    Destroy(collision.gameObject);
-                }
-            }
+        Item item = collision.GetComponent<Item>();
+        if (item == null) return;
+
+        if (!collision.enabled) return; //already being processed
+        collision.enabled = false; // lock immediately
+
+        bool itemAdded = inventoryController.AddItem(collision.gameObject);
+
+        if (itemAdded)
+        {
+            item.PickUp();
+            Destroy(collision.gameObject);
         }
+        else
+        {
+            collision.enabled = true;           // inventory full - let player retry
+        }
+     
     }
 
 }

@@ -16,8 +16,11 @@ public class TreeData : ScriptableObject
 
     [Header("Fruit (leave fruitItem null for wood-only trees)")]
     public Item fruitItem;
-    public int ripenHours = 48;
-    public int fruitPerHarvest = 1;
+    public int maxFruitCount = 3;
+    public int yieldPerPick = 1;
+    public float matureCooldownHours = 2f;
+    public float fruitGrowMinHours = 0f;
+    public float fruitGrowMaxHours = 24f;
 
     [Header("Regrowth")]
     public int regrowHours = 72;
@@ -31,7 +34,6 @@ public class TreeData : ScriptableObject
     public Sprite saplingSprite;
     public Sprite topSprite;
     public Sprite stumpSprite;
-    public Sprite fruitOverlay;
 
     [Header("Prefab")]
     public GameObject treePrefab;

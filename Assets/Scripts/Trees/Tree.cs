@@ -1,4 +1,6 @@
+using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.Rendering;
 public enum TreeState
 {
     Seedling,
@@ -23,7 +25,7 @@ public class Tree : MonoBehaviour
     [Header("Renderers (assign in prefab)")]
     public SpriteRenderer topRenderer;
     public SpriteRenderer stumpRenderer;
-    public SpriteRenderer fruitRenderer;
+    public SpriteRenderer[] fruitRenderers;
 
     [Header("Animator (assign in prefab")]
     public TreeAnimator animator;
@@ -35,6 +37,10 @@ public class Tree : MonoBehaviour
     public float fallAlignThreshold = 0.5f;
     public float woodDropMinDistance = 1.2f;
     public float woodDropMaxDistance = 2.0f;
+
+    [Header("Fruit Runtime")]
+    public int currentFruitCount = 0;
+    private float nextFruitGrowsAtTotalHours = 0f;
 
     [Header("Guard Flag")]
     private bool isFelling;
@@ -56,6 +62,7 @@ public class Tree : MonoBehaviour
         if (stateEnteredAtTotalHours == 0f)
         {
             stateEnteredAtTotalHours = DayCycleManager.Instance.TotalHours;
+            ScheduleNextFruit();
             return;
         }
 
@@ -67,12 +74,40 @@ public class Tree : MonoBehaviour
                 if (elapsed >= treeData.growHours) Enter(TreeState.Mature);
                 break;
             case TreeState.Mature:
-                if (treeData.fruitItem != null && elapsed >= treeData.ripenHours) Enter(TreeState.Ripe);
+            case TreeState.Ripe:
+                if (treeData.fruitItem == null) break;
+                if (currentFruitCount >= treeData.maxFruitCount) break;
+                if (DayCycleManager.Instance.TotalHours >= nextFruitGrowsAtTotalHours)
+                {
+                    currentFruitCount++;
+                    if (state == TreeState.Mature)
+                    {
+                        Enter(TreeState.Ripe); // Enter() reschedules via ScheduleNextFruit
+                    }
+                    else
+                    {
+                        UpdateSprite();
+                        if (currentFruitCount < treeData.maxFruitCount) ScheduleNextFruit(); 
+                        // at cap -> freeze timer and queue up the next fruit when pick fruit
+                    }
+                }
                 break;
+
             case TreeState.Stump:
                 if (treeData.regrows && elapsed >= treeData.regrowHours) Enter(TreeState.Mature);
                 break;
         }
+    }
+    private void ScheduleNextFruit()
+    {
+        if (treeData == null || treeData.fruitItem == null) return;
+        if (DayCycleManager.Instance == null) return;
+
+        float now = DayCycleManager.Instance.TotalHours;
+        if (state == TreeState.Mature)
+            nextFruitGrowsAtTotalHours = now + treeData.matureCooldownHours;
+        else if (state == TreeState.Ripe)
+            nextFruitGrowsAtTotalHours = now + Random.Range(treeData.fruitGrowMinHours, treeData.fruitGrowMaxHours);
     }
 
     private void Enter(TreeState next)
@@ -84,6 +119,7 @@ public class Tree : MonoBehaviour
         }
         UpdateSprite();
         if (trunkCollider != null) trunkCollider.enabled = (next != TreeState.Stump);
+        ScheduleNextFruit();
     }
 
     public void TakeDamage(int damage, Vector3 chopperWorldPos)
@@ -98,13 +134,34 @@ public class Tree : MonoBehaviour
 
         if (state == TreeState.Ripe)
         {
-            DropFruits();
+            DropFruits(currentFruitCount);
+            currentFruitCount = 0;
             Enter(TreeState.Mature);
             return;
         }
 
         hpRemaining -= damage;
         if (hpRemaining <= 0) Fell(fallDir);
+    }
+    public void PickFruit()
+    {
+        if (state != TreeState.Ripe) return;
+        if (currentFruitCount <= 0) return;
+
+        bool wasAtMax = (currentFruitCount >= treeData.maxFruitCount);
+
+        DropFruits(1);
+        currentFruitCount--;
+
+        if (currentFruitCount <= 0)
+        {
+        Enter(TreeState.Mature);
+        }
+        else
+        {
+            UpdateSprite();
+            if (wasAtMax) ScheduleNextFruit();
+        }
     }
 
     private int ComputeFallDirection(Vector3 chopperWorldPos)
@@ -174,14 +231,22 @@ public class Tree : MonoBehaviour
         }
     }
 
-    private void DropFruits()
+    private void DropFruits(int count)
     {
         if (treeData.fruitItem == null) return;
-        for (int i = 0;i < treeData.fruitPerHarvest;i++)
+        int totalItems = count * treeData.yieldPerPick;
+        if (totalItems <= 0) return;
+
+
+        for (int i = 0; i < totalItems;i++)
         {
-            Vector3 offset = new Vector3(Random.Range(-0.3f, 0.3f), Random.Range(-0.3f, 0.3f), 0f);
+            float angle = (i / (float)totalItems) * Mathf.PI * 2f + Random.Range(-0.2f, 0.2f);
+            float radius = Random.Range(0.6f, 0.9f);
+
+            Vector3 offset = new Vector3(Mathf.Cos(angle) * radius, Mathf.Sin(angle), 0f);
+
             GameObject drop = Instantiate(treeData.fruitItem.gameObject, transform.position + offset, Quaternion.identity);
-            var bounce = drop.GetComponent <BounceEffect>();
+            var bounce = drop.GetComponent<BounceEffect>();
             if (bounce != null) bounce.StartBounce();
         }
     }
@@ -228,11 +293,13 @@ public class Tree : MonoBehaviour
                 break;
         }
 
-        if(fruitRenderer != null)
+        if(fruitRenderers != null)
         {
-            bool showFruit = state == TreeState.Ripe && treeData.fruitOverlay != null;
-            fruitRenderer.sprite = showFruit ? treeData.fruitOverlay : null;
-            fruitRenderer.enabled = showFruit;
+            for (int i = 0; i < fruitRenderers.Length; i++)
+            {
+                if (fruitRenderers[i] != null)
+                    fruitRenderers [i].gameObject.SetActive(i < currentFruitCount);
+            }
         }
     }
 
