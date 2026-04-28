@@ -7,6 +7,9 @@ public class Item : MonoBehaviour
     public string Name;
     public Sprite heldSprite;
 
+    public int maxStack = 99;
+    public int count = 1;
+
     public virtual void UseItem()
     {
         Debug.Log($"Using item {Name}.");

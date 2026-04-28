@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -14,6 +15,7 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     public float maxDropDistance = 3f;
 
     private bool isDragging = false;
+    private int carriedCount;
     private Slot originalSlot; // cached source slot
 
 
@@ -34,10 +36,33 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     public void OnBeginDrag(PointerEventData eventData)
     {
         originalParent = transform.parent; //Save OG Parent
+        originalSlot = originalParent.GetComponent<Slot>();
+
+        bool shiftHeld = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+
+        if (shiftHeld && originalSlot.count > 1)
+        {
+            // Split: dragged carries ceiling-half, source keeps the rest with a duplicate icon.
+            carriedCount = (originalSlot.count + 1) / 2;
+            int remainder = originalSlot.count - carriedCount;
+
+            GameObject duplicate = Instantiate(gameObject, originalSlot.transform);
+            duplicate.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+            CanvasGroup dupCg = duplicate.GetComponent<CanvasGroup>();
+            if (dupCg != null) { dupCg.alpha = 1f; dupCg.blocksRaycasts = true; }
+
+            originalSlot.currentItem = duplicate;
+            originalSlot.count = remainder;
+            originalSlot.RefreshCountText();
+        }
+        else
+        {
+            carriedCount = originalSlot.count;
+        }
+
         transform.SetParent(transform.root); //Above other canvas'
         canvasGroup.blocksRaycasts = false; //
         canvasGroup.alpha = 0.6f; //semi-transparent during drag
-        originalSlot = originalParent.GetComponent<Slot>();
         isDragging = true;
     }
 
@@ -51,6 +76,8 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         canvasGroup.blocksRaycasts = true; //Enable raycasts
         canvasGroup.alpha = 1f; //No longer transparent
         isDragging = false;
+
+        bool isSplit = (originalSlot.currentItem != gameObject);
 
         Slot dropSlot = eventData.pointerEnter?.GetComponent<Slot>(); //Slot where item dropped
         if (dropSlot == null )
@@ -67,12 +94,17 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         {
             if (!IsWithinInventory(eventData.position))
             {
-                DropItem(originalSlot);
+                DropItem(carriedCount);
+                if (!isSplit)
+                {
+                    originalSlot.currentItem = null;
+                    originalSlot.count = 0;
+                    originalSlot.RefreshCountText();
+                }
             }
             else
             {
-                transform.SetParent(originalParent);
-                GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+                ReturnToSource(isSplit);
             }
             return;
         }
@@ -80,8 +112,7 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         // Drop on source slot - snap back
         if (dropSlot == originalSlot)
         {
-            transform.SetParent(originalParent);
-            GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+            ReturnToSource(isSplit);
             return;
         }    
 
@@ -89,15 +120,18 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         if (dropSlot.currentItem == null)
         {
             transform.SetParent(dropSlot.transform);
+            GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
             dropSlot.currentItem = gameObject;
-            dropSlot.count = originalSlot.count;
+            dropSlot.count = carriedCount;
             dropSlot.RefreshCountText();
 
-            originalSlot.currentItem = null;
-            originalSlot.count = 0;
-            originalSlot.RefreshCountText();
+            if (!isSplit)
+            {
+                originalSlot.currentItem = null;
+                originalSlot.count = 0;
+                originalSlot.RefreshCountText();
 
-            GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+            }
             return;
         }
 
@@ -107,7 +141,7 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
         if (dropItem.ID == draggedItem.ID)
         {
-            int total = dropSlot.count + originalSlot.count;
+            int total = dropSlot.count + carriedCount;
             int maxStack = draggedItem.maxStack;
 
             if (total <= maxStack)
@@ -115,24 +149,47 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
                 // All fits - dropSlot absorbs everything, dragged is destroyed
                 dropSlot.count = total;
                 dropSlot.RefreshCountText();
-                originalSlot.currentItem = null;
-                originalSlot.count = 0;
-                originalSlot.RefreshCountText();
+
+                if (!isSplit)
+                {
+                    originalSlot.currentItem = null;
+                    originalSlot.count = 0;
+                    originalSlot.RefreshCountText();
+                }
                 Destroy(gameObject);
             }
             else
             {
                 // Overflow -dropSlot fills to max, dragged returns to source
+                int overflow = total - maxStack;
                 dropSlot.count = maxStack;
                 dropSlot.RefreshCountText();
-                originalSlot.count = total - maxStack;
-                originalSlot.RefreshCountText();
-                transform.SetParent(originalParent);
-                GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+                
+                if (isSplit)
+                {
+                    originalSlot.count += overflow;
+                    originalSlot.RefreshCountText();
+                    Destroy(gameObject);
+                }
+                else
+                {
+                    originalSlot.count = overflow;
+                    originalSlot.RefreshCountText();
+                    transform.SetParent(originalParent);
+                    GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+                }
             }
             return;
         }
+
         // Drop on slot with different item -swap items + counts
+        if (isSplit)
+        {
+            // Swap doesn't make sense for a half-stack -cancel
+            ReturnToSource(true); return;
+        }
+
+        // Normal
         int draggedCount = originalSlot.count;
         int swappedCount = dropSlot.count;
 
@@ -149,14 +206,27 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
         GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
     }
-
+    void ReturnToSource(bool isSplit)
+    {
+        if (isSplit)
+        {
+            originalSlot.count += carriedCount;
+            originalSlot.RefreshCountText();
+            Destroy(gameObject);
+        }
+        else
+        {
+            transform.SetParent(originalParent);
+            GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+        }
+    }
     bool IsWithinInventory(Vector2 mousePosition)
     {
         RectTransform inventoryRect = originalParent.parent.GetComponent<RectTransform>();
         return RectTransformUtility.RectangleContainsScreenPoint(inventoryRect, mousePosition);
     }
 
-    void DropItem(Slot originalSlot)
+    void DropItem(int count)
     {
         if (playerTransform == null)
         {
@@ -179,14 +249,8 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         Vector2 dropPos = (Vector2)playerTransform.position + offset;
 
         GameObject dropItem = Instantiate(worldPrefab, dropPos, Quaternion.identity);
-        dropItem.GetComponent<Item>().count = originalSlot.count;
+        dropItem.GetComponent<Item>().count = count;
         dropItem.GetComponent<BounceEffect>().StartBounce();
-        
-
-        // Clear the slot
-        originalSlot.currentItem = null;
-        originalSlot.count = 0;
-        originalSlot.RefreshCountText();
 
         // Destroy the UI item being dragged
         Destroy(gameObject);
@@ -242,10 +306,12 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     {
         if (originalSlot == null) return;
 
+        bool isSplit = (originalSlot.currentItem != gameObject);
         Slot targetSlot = FindSlotUnderCursor();
 
         // RMB on the source slot itself does nothing
-        if (targetSlot == originalSlot) return;
+        // Normal mode : RMB on source is meaningless
+        if (!isSplit && targetSlot == originalSlot) return;
 
         Item draggedItem = GetComponent<Item>();
         bool didAction = false;
@@ -258,6 +324,13 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         else if (targetSlot.currentItem == null)
         {
             PlacedOneInSlot(targetSlot);
+            didAction = true;
+        }
+        else if (targetSlot == originalSlot)
+        {
+            // Split mode: put one back into the remainder
+            originalSlot.count++;
+            originalSlot.RefreshCountText();
             didAction = true;
         }
         else
@@ -274,15 +347,25 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
         if (!didAction) return;
 
-        // Decrement source
-        originalSlot.count--;
-        originalSlot.RefreshCountText();
-
-        //End drag if source is empty
-        if (originalSlot.count <= 0)
+        if (isSplit)
         {
-            originalSlot.currentItem = null;
-            Destroy(gameObject);
+            carriedCount--;
+            if (carriedCount <= 0)
+            {
+                Destroy(gameObject);
+            }
+        }
+        else
+        {
+            // Decrement source
+            originalSlot.count--;
+            originalSlot.RefreshCountText();
+            //End drag if source is empty
+            if (originalSlot.count <= 0)
+            {
+                originalSlot.currentItem = null;
+                Destroy(gameObject);
+            }
         }
     }
 }

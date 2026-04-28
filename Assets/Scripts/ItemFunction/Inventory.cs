@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class Inventory : MonoBehaviour
 {
@@ -15,34 +16,53 @@ public class Inventory : MonoBehaviour
     {
         itemDictionary = FindAnyObjectByType<ItemDictionary>();
 
-        //for(int i = 0; i< slotCount; i++)
-        //{
-        //    Slot slot = Instantiate(slotPrefab, inventoryPanel.transform).GetComponent<Slot>();
-        //    if(i < itemPrefabs.Length)
-        //    {
-        //        GameObject item = Instantiate(itemPrefabs[i], slot.transform);
-        //        item.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-        //        slot.currentItem = item;
-        //    }
-        //}
     }
     public bool AddItem(GameObject itemPrefab)
     {
-        //Look for empty slot in inventory
+        Item incoming = itemPrefab.GetComponent<Item>();
+        int remaining = incoming.count;
+
+        // Pass 1 - try to stack onto an existing slot with the same item
         foreach(Transform slotTransform in inventoryPanel.transform)
         {
+            if (remaining == 0) break;
             Slot slot = slotTransform.GetComponent<Slot>();
-            if (slot != null && slot.currentItem == null)
+            if (slot == null || slot.currentItem == null) continue;
+
+            Item slotItem = slot.currentItem.GetComponent<Item>();
+            if (slotItem.ID != incoming.ID) continue;
+
+            int space = incoming.maxStack - slot.count;
+            if (space <= 0) continue;
+
+            int add = Mathf.Min(space, remaining);
+            slot.count += add;
+            remaining -= add;
+            slot.RefreshCountText();
+        }
+            foreach (Transform slotTransform in inventoryPanel.transform)
             {
+                if (remaining == 0) break;
+                Slot slot = slotTransform.GetComponent<Slot>();
+                if (slot == null || slot.currentItem != null) continue;
+
+                int put = Mathf.Min(incoming.maxStack, remaining);
                 GameObject newItem = Instantiate(itemPrefab, slot.transform);
                 newItem.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
                 slot.currentItem = newItem;
-                return true;
+                slot.count = put;
+                slot.RefreshCountText();
+                remaining -= put;
             }
-        }
 
-        Debug.Log("Inventory is full!");
-        return false;
+        incoming.count = remaining;
+
+        if (remaining > 0)
+        {
+            Debug.Log("Inventory is full, " + remaining + " left over");
+            return false;
+        }
+        return true;
     }
 
     public List<InventorySaveData> GetInventoryItems()
