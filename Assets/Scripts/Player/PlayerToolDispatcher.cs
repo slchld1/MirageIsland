@@ -38,7 +38,7 @@ public class PlayerToolDispatcher : MonoBehaviour
             {
                 if (Time.time < nextChopAllowedAt) return;
 
-                Tree tree = FindTreeAt(world);
+                TreeMain tree = FindTreeAt(world);
                 if (tree != null) tree.TakeDamage(axe.damage, transform.position);
                 nextChopAllowedAt = Time.time + chopCooldown;
             }
@@ -48,17 +48,17 @@ public class PlayerToolDispatcher : MonoBehaviour
         // RMB: universal pick (works with any item, including barehanded)
         if (rmb)
         {
-            Tree tree = FindTreeAt(world);
+            TreeMain tree = FindTreeAt(world);
             if (tree != null) tree.PickFruit();
         }
 
 
     }
 
-    private Tree FindTreeAt(Vector3 worldPos)
+    private TreeMain FindTreeAt(Vector3 worldPos)
     {
         Collider2D hit = Physics2D.OverlapPoint(worldPos, treeLayer);
-        return hit != null ? hit.GetComponent<Tree>() : null;
+        return hit != null ? hit.GetComponent<TreeMain>() : null;
     }
 
 

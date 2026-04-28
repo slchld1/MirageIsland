@@ -9,7 +9,7 @@ public enum TreeState
     Stump,
 }
 
-public class Tree : MonoBehaviour
+public class TreeMain : MonoBehaviour
 {
     [Header("Config")]
     public TreeData treeData;

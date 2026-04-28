@@ -52,7 +52,7 @@ public class MouseCursorIndicator : MonoBehaviour
         Collider2D treeHit = Physics2D.OverlapPoint(worldPos, treeLayer);
         if (treeHit != null)
         {
-            Tree tree = treeHit.GetComponent<Tree>();
+            TreeMain tree = treeHit.GetComponent<TreeMain>();
             if (tree != null)
             {
                 // Axe chop available on Mature or Ripe trees
