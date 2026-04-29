@@ -1,4 +1,3 @@
-using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -22,6 +21,8 @@ public class Movement : MonoBehaviour
     public float speed = 5;
     public float footstepSpeed = 0.5f;
 
+    public PlayerToolDispatcher toolDispatcher;
+
 
     private void Awake()
     {
@@ -33,6 +34,12 @@ public class Movement : MonoBehaviour
     }
     private void Update()
     {
+        if (toolDispatcher != null && toolDispatcher.IsChopping)
+        {
+            rb.linearVelocity = Vector2.zero;
+            StopFootsteps();
+            return;
+        }
         if (PauseController.IsGamePaused || FishingController.IsFishing)
         {
             rb.linearVelocity = Vector2.zero;
@@ -92,6 +99,7 @@ public class Movement : MonoBehaviour
     
     void PlayFootstep()
     {
+        if (toolDispatcher != null && toolDispatcher.IsChopping) return;
         SoundEffectManager.Play("Footstep", true);
     }
 

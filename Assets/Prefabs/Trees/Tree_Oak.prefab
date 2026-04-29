@@ -153,10 +153,12 @@ MonoBehaviour:
   fruitRenderers: []
   animator: {fileID: 8321995344061176726}
   trunkCollider: {fileID: 4262788143352713870}
+  stumpCollider: {fileID: 3671145638704017573}
   fallAlignThreshold: 0.5
   woodDropMinDistance: 1.2
   woodDropMaxDistance: 2
   currentFruitCount: 0
+  chopReach: 1
 --- !u!61 &3671145638704017573
 BoxCollider2D:
   m_ObjectHideFlags: 0

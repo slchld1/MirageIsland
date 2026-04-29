@@ -190,10 +190,12 @@ MonoBehaviour:
   - {fileID: 803623855832685282}
   animator: {fileID: 8321995344061176726}
   trunkCollider: {fileID: 4262788143352713870}
+  stumpCollider: {fileID: 3671145638704017573}
   fallAlignThreshold: 0.5
   woodDropMinDistance: 1.2
   woodDropMaxDistance: 2
   currentFruitCount: 0
+  chopReach: 1
 --- !u!61 &3671145638704017573
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -228,7 +230,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.18782014, y: -0.40606937}
+  m_Offset: {x: -0.18782014, y: -0.43921742}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -238,7 +240,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.50214803, y: 0.8994594}
+  m_Size: {x: 0.50214803, y: 0.8331633}
   m_EdgeRadius: 0
 --- !u!61 &4262788143352713870
 BoxCollider2D:

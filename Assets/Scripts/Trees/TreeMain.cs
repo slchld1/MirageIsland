@@ -32,6 +32,7 @@ public class TreeMain : MonoBehaviour
 
     [Header("Colliders (assign in prefab)")]
     public Collider2D trunkCollider;
+    public Collider2D stumpCollider;
 
     [Header("Fall")]
     public float fallAlignThreshold = 0.5f;
@@ -44,6 +45,9 @@ public class TreeMain : MonoBehaviour
 
     [Header("Guard Flag")]
     private bool isFelling;
+
+    [Header("Chop Reach")]
+    public float chopReach = 1f; // grid units of slack outside the stump
 
 
     private void Awake()
@@ -143,6 +147,41 @@ public class TreeMain : MonoBehaviour
         hpRemaining -= damage;
         if (hpRemaining <= 0) Fell(fallDir);
     }
+
+    public bool IsPlayerWithinChopRange(Vector3 playerPos)
+    {
+        if (stumpCollider == null) return false;
+        Vector2 closest = stumpCollider.ClosestPoint(playerPos);
+        float dist = Vector2.Distance(playerPos, closest);
+        Debug.Log($"player={playerPos}  closest={closest}  dist={dist:F2}  reach={chopReach}");
+        return Vector2.Distance(playerPos, closest) <= chopReach;
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (stumpCollider == null) return;
+
+        BoxCollider2D box = stumpCollider as BoxCollider2D;
+        if (box == null) return;
+
+        Vector3 worldCenter = box.transform.TransformPoint(box.offset);
+        Vector2 worldSize = Vector2.Scale(box.size, (Vector2)box.transform.lossyScale);
+
+        Gizmos.color = new Color(0.5f, 0.5f, 0.5f, 0.6f);
+        Gizmos.DrawWireCube(worldCenter, worldSize);
+
+        Gizmos.color = Color.green;
+        Vector2 half = worldSize * 0.5f;
+        Vector3[] corners =
+        {
+          new Vector3(worldCenter.x - half.x, worldCenter.y - half.y, 0f),
+          new Vector3(worldCenter.x + half.x, worldCenter.y - half.y, 0f),
+          new Vector3(worldCenter.x - half.x, worldCenter.y + half.y, 0f),
+          new Vector3(worldCenter.x + half.x, worldCenter.y + half.y, 0f),
+        };
+        foreach (var c in corners) Gizmos.DrawWireSphere(c, chopReach);
+    }
+
     public void PickFruit()
     {
         if (state != TreeState.Ripe) return;

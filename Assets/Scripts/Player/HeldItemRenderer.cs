@@ -26,6 +26,9 @@ public class HeldItemRenderer : MonoBehaviour
     [Tooltip("Invert the flip direction if the sprite is facing the wrong way")]
     public bool invertFlip = false;
 
+    [Tooltip("Hide the held item while a shop swing is active")]
+    public PlayerToolDispatcher toolDispatcher;
+
     private HotbarController hotbarController;
     private SpriteRenderer   holdRenderer;
     private int              lastSlotIndex = -2;
@@ -54,6 +57,7 @@ public class HeldItemRenderer : MonoBehaviour
         else
             idleTimer += Time.deltaTime;
 
+        bool chopping = toolDispatcher != null && toolDispatcher.IsChopping;
         holdRenderer.enabled = !isMoving && idleTimer >= showDelay && holdRenderer.sprite != null;
 
         // Only update sprite when selection changes

@@ -13,6 +13,8 @@ public class PlayerToolDispatcher : MonoBehaviour
     [Header("Action Timing")]
     public float chopCooldown = 0.4f;
     public float nextChopAllowedAt = 0f;
+    public bool IsChopping =>Time.time < nextChopAllowedAt;
+    public Animator playerAnimator;
 
     private void Update()
     {
@@ -20,10 +22,11 @@ public class PlayerToolDispatcher : MonoBehaviour
         if (Mouse.current == null) return;
 
         bool lmb = Mouse.current.leftButton.wasPressedThisFrame;
+        bool lmbHeld = Mouse.current.leftButton.isPressed;
         bool rmb = Mouse.current.rightButton.wasPressedThisFrame;
         if (lmb || rmb) Debug.Log($"LMB={lmb} RMB={rmb}");
 
-        if (!lmb && !rmb) return;
+        if (!lmbHeld && !rmb) return;
 
         Vector2 screenPos = Mouse.current.position.ReadValue();
         Vector3 world = cam.ScreenToWorldPoint(new Vector3(screenPos.x, screenPos.y, -cam.transform.position.z));
@@ -32,15 +35,19 @@ public class PlayerToolDispatcher : MonoBehaviour
         Item active = hotbar.GetActiveItem();
 
 
-        if (lmb && active != null)
+        if (lmbHeld && active != null)
         {
             if(active is Axe axe)
             {
                 if (Time.time < nextChopAllowedAt) return;
 
+                if (playerAnimator != null) playerAnimator.SetTrigger("Chop");
                 TreeMain tree = FindTreeAt(world);
-                if (tree != null) tree.TakeDamage(axe.damage, transform.position);
-                nextChopAllowedAt = Time.time + chopCooldown;
+                if (tree != null && tree.IsPlayerWithinChopRange(transform.position))
+                    {
+                    tree.TakeDamage(axe.damage, transform.position);
+                    }
+                    nextChopAllowedAt = Time.time + chopCooldown;
             }
             // PlantableSeed + fruit-pick branches added later 
         }
