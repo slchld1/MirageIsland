@@ -459,22 +459,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FishLootTable
   fishEntries:
-  - fishName: Sea Catfish
-    itemID: 220001
-    baseWeight: 60
-    rarity: 2
-    phases:
-    - type: 1
-      duration: 12
-      eventInterval: 4
-      possibleEvents: 0000000001000000
-    preDawnBonus: 0
-    dawnBonus: 0
-    dayBonus: 0
-    duskBonus: 0
-    nightBonus: 0
-    baitBonuses: []
-    rodTierBonuses: 
   - fishName: Fish
     itemID: 220000
     baseWeight: 60
@@ -484,6 +468,22 @@ MonoBehaviour:
       duration: 10
       eventInterval: 3
       possibleEvents: 00000000
+    preDawnBonus: 0
+    dawnBonus: 0
+    dayBonus: 0
+    duskBonus: 0
+    nightBonus: 0
+    baitBonuses: []
+    rodTierBonuses: 
+  - fishName: Sea Catfish
+    itemID: 220001
+    baseWeight: 60
+    rarity: 2
+    phases:
+    - type: 1
+      duration: 12
+      eventInterval: 4
+      possibleEvents: 0000000001000000
     preDawnBonus: 0
     dawnBonus: 0
     dayBonus: 0
