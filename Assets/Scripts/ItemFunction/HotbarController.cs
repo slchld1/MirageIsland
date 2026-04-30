@@ -52,7 +52,21 @@ public class HotbarController : MonoBehaviour
         if (slot == null || slot.currentItem == null) return null;
         return slot.currentItem.GetComponent<Item>();
     }
+    public void ConsumeActive()
+    {
+        if (SelectedSlotIndex < 0 || SelectedSlotIndex >= hotbarpanel.transform.childCount) return;
+        Slot slot = hotbarpanel.transform.GetChild(SelectedSlotIndex).GetComponent<Slot>();
+        if (slot == null || slot.currentItem == null) return;
 
+        slot.count--;
+        if (slot.count <= 0)
+        {
+            Destroy(slot.currentItem);
+            slot.currentItem = null;
+            slot.count = 0;
+        }
+        slot.RefreshCountText();
+    }
     public List<InventorySaveData> GetHotbarItems()
     {
         List<InventorySaveData> invData = new List<InventorySaveData>();
