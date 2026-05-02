@@ -17,8 +17,9 @@ GameObject:
   - component: {fileID: 7227904567938389395}
   - component: {fileID: 1392059317416058474}
   - component: {fileID: 2177127895924122503}
+  - component: {fileID: -6735705883362366382}
   m_Layer: 5
-  m_Name: Fish
+  m_Name: BaitSeed
   m_TagString: Item
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33,7 +34,7 @@ RectTransform:
   m_GameObject: {fileID: 8159287903480405637}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 1}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -71,7 +72,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: be45080000eea964a9b1062ace7a967f, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e705a67b81a0f4044a17fdb99b7a938c, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -119,8 +120,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 294fcddc3df33c14bb4e2c3feee5eae4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  ID: 220000
-  Name: Fish
+  ID: 500001
+  Name: BaitSeed
   heldSprite: {fileID: 0}
   maxStack: 99
   count: 1
@@ -173,7 +174,7 @@ SpriteRenderer:
   m_SortingLayer: 7
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: be45080000eea964a9b1062ace7a967f, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e705a67b81a0f4044a17fdb99b7a938c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -182,7 +183,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!114 &1392059317416058474
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -195,8 +196,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a80a390032f53f4e9d3fb12bd9dc0d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BounceEffect
-  bounceHeight: 0.3
-  bounceDuration: 0.4
+  bounceHeight: 1
+  bounceDuration: 0.6
   bounceCount: 2
 --- !u!58 &2177127895924122503
 CircleCollider2D:
@@ -232,5 +233,19 @@ CircleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_Radius: 0.5
+  m_Offset: {x: -0.0020141602, y: 0.26763916}
+  m_Radius: 0.27215576
+--- !u!114 &-6735705883362366382
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8159287903480405637}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f20473e859981440b1eec55eb890c5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PickupDelay
+  delaySeconds: 0.5
+  pickupCollider: {fileID: 2177127895924122503}

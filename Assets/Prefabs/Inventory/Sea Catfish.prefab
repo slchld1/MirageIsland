@@ -96,6 +96,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7227904567938389395, guid: 00095528d0815844ca5a6a128ae81318, type: 3}
+      propertyPath: m_SpriteSortPoint
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8159287903480405637, guid: 00095528d0815844ca5a6a128ae81318, type: 3}
       propertyPath: m_Name
       value: Sea Catfish
