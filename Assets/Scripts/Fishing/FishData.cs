@@ -1,20 +1,5 @@
 using UnityEngine;
 
-public enum PhaseType { Calm, Struggle, Tired }
-public enum EventType { Dart, Tug }
-
-[System.Serializable]
-public class FightPhase
-{
-    public PhaseType type;
-    [Tooltip("How long this phase lasts in seconds")]
-    public float duration = 5f;
-    [Tooltip("Base seconds between reaction events (scaled by rarity at runtime)")]
-    public float eventInterval = 4f;
-    [Tooltip("Which event types can fire during this phase")]
-    public EventType[] possibleEvents;
-}
-
 [System.Serializable]
 public class BaitBonusEntry
 {
@@ -34,8 +19,6 @@ public class FishData
     [Range(1, 5)]
     [Tooltip("1 = common (forgiving), 5 = legendary (tight windows, fast events)")]
     public int rarity = 1;
-    [Tooltip("Fight phases played in order. Leave empty for plain tension-bar fight.")]
-    public FightPhase[] phases;
 
     [Header("Time of Day Bonuses")]
     public int preDawnBonus;
