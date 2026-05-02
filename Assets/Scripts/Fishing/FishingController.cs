@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -17,13 +18,20 @@ public class FishingController : MonoBehaviour
     [Tooltip("Set to the 'Water' layer in Project Settings")]
     public LayerMask waterLayer;
 
+    [Header("Tuning")]
+    [Tooltip("Drag FishingTuning.asset here")]
+    public FishingTuning tuning;
+
     [Header("Cast Charge")]
     [Tooltip("Shortest cast distance at zero charge (world units)")]
     public float minCastDistance = 0.5f;
+
     [Tooltip("Oscillation speed — full cycles (0→1→0) per second")]
     public float chargeRate = 0.8f;
+
     [Tooltip("Cast speed multiplier at full charge, relative to rod.castSpeed")]
     public float maxSpeedMultiplier = 1.5f;
+
     [SerializeField] private CastChargeUI castChargeUI;
 
     public FishingRod ActiveRod { get; private set; }
@@ -235,7 +243,9 @@ public class FishingController : MonoBehaviour
         {
             GameObject fishPrefab = itemDictionary.GetItemPrefab(rolledFish.itemID);
             if (fishPrefab != null)
-                inventory.AddItem(fishPrefab);
+            {
+                bool added = inventory.AddItem(fishPrefab);
+            }
         }
 
         // Consume one bait on success
