@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c71219a82941a44a8b8eadbfc775b0e, type: 3}
+  m_Name: FishingTuning
+  m_EditorClassIdentifier: Assembly-CSharp::FishingTuning
+  minCastDistance: 2
+  chargeOscillationRate: 0.8
+  maxSpeedMultiplier: 1.5
+  waitHookChancePerSecond: 0.06
+  reelHookChancePerPixel: 0.01125
+  slowReelSpeed: 16
+  fastReelSpeed: 32
+  shoreCatchThreshold: 0.5
+  nearShoreThreshold: 1
+  reelStartBuffer: 0.5
+  landSampleDensity: 8
+  lateralShrinkStep: 0.5
+  minLateralHalfWidth: 4
+  baseFishStrength: 30
+  baseDartChance: 0.5
+  dartDurationBase: 0.6
+  dartDurationPerRarity: 0.1
+  restDurationBase: 1
+  restDurationPerRarity: -0.1
+  dartStaminaCost: 25
+  fishStaminaMaxBase: 100
+  fishStaminaMaxPerRarity: 25
+  staminaRegenWhileFollowing: 5
+  staminaRegenWhileResting: 40
+  followSpeed: 4
+  dartWeightsRarity1: {x: 0.4, y: 0.4, z: 0.2}
+  dartWeightsRarity5: {x: 0.3, y: 0.3, z: 0.4}
+  lateralHoldForce: 25
+  lateralTapImpulse: 8
+  straightOutTapImpulse: 5
+  fleeWarnTapImpulse: 18
+  fleeWarnStraightOutTapImpulse: 12
+  fleeWarnThreshold: 0.85
+  fleeWarnUiPulseRate: 4
+  tensionMax: 100
+  tensionDecayPerSecond: 5
+  tensionSnapWindow: 0.1
+  biteFleeDuration: 0.45
+  biteFleeStrength: 35
+  biteFleeFollowSpeed: 6
+  biteFleeInputDamp: 0.3
+  biteFleeTensionPunch: 50
+  playerMoveCancelDistance: 0.1
