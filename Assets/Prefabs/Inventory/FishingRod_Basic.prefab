@@ -126,8 +126,8 @@ MonoBehaviour:
   count: 1
   rodTier: 1
   tipOffset: {x: 0, y: 0.2}
-  castDistance: 5
-  castSpeed: 2
+  castDistance: 8
+  castSpeed: 4
   equippedBait: 0
   baitCount: 0
 --- !u!212 &7227904567938389395
