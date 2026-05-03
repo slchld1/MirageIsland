@@ -26,6 +26,10 @@ public class FishingController : MonoBehaviour
     [Header("Cast Charge")]
     [SerializeField] private CastChargeUI castChargeUI;
 
+    [Header("Fish")]
+    [Tooltip("Prefab with Fish.cs + SpriteRenderer; spawned at lure on hook")]
+    public GameObject fishPrefab;
+
     public FishingRod ActiveRod { get; private set; }
     public float ChargeLevel => chargeLevel;
 
@@ -36,11 +40,14 @@ public class FishingController : MonoBehaviour
 
     private FishingState state     = FishingState.Idle;
     private FightArena arena;
-    private FishData rolledFish;
     private float chargeLevel;
     private float chargeDir = 1f;
 
     private LureReeler lureReeler;
+    private Fish activeFish;
+    private FishingFight activeFight;
+    private FishData rolledFish;
+
 
     private void Awake()
     {
@@ -262,7 +269,6 @@ public class FishingController : MonoBehaviour
 
     private void OnFishHooked()
     {
-        Debug.Log($"[Fishing] HOOKED via {lureSubMode}. Bait left: {(ActiveRod != null ? ActiveRod.baitCount : 0)}");
         // Bait consumed on hook (NOT on cast)
         if (ActiveRod != null && ActiveRod.equippedBait != BaitType.None)
         {
@@ -273,20 +279,84 @@ public class FishingController : MonoBehaviour
                 ActiveRod.equippedBait = BaitType.None;
             }
         }
-
         lureReeler.Stop();
+
+        // Roll the fish species
+        int rodTier = ActiveRod != null ? ActiveRod.rodTier : 1;
+        BaitType baitT = ActiveRod != null ? ActiveRod.equippedBait : BaitType.None;
+        TimeOfDay phase = DayCycleManager.Instance.CurrentPhase;
+        rolledFish = FishLootTable.Instance.Roll(rodTier, baitT, phase);
+
+        // Spawn fish + fight
+        Vector2 lurePos = fishingLine.BobPosition;
+        GameObject fishGo = Instantiate(fishPrefab, lurePos, Quaternion.identity);
+        activeFish = fishGo.GetComponent<Fish>();
+        activeFight = gameObject.AddComponent<FishingFight>();
+        activeFight.Init(arena, tuning, fishingLine, activeFish, this);
+        activeFish.Init(rolledFish, arena, tuning, activeFight, lurePos);
+
+        // Apply bite-flee tension punch (one-shot — the punch is implemented in Phase 6)
+        activeFight.PunchTension(tuning.biteFleeTensionPunch);
+
+        Debug.Log($"[Fishing] HOOKED via {lureSubMode}. Bait left: {(ActiveRod != null ? ActiveRod.baitCount : 0)}");
         state = FishingState.FishHooked;
         SoundEffectManager.Play("FishBite");
 
-        // Phase 5 replaces this with the bite-flee opening + transition to FightingFish.
-        // Phase 4 stub: end fishing immediately.
-        EndFishing();
     }
     // ── FishHooked (placeholder) ─────────────────────────────────────────────
-    private void UpdateFishHooked() { /* Phase 5 fills in bite-flee opening */ }
+    private void UpdateFishHooked() 
+    {
+        activeFish.Tick(Time.deltaTime);
+        activeFight.Tick(Time.deltaTime, dampedInput: true);
+
+        if (!activeFish.IsBiteFleeing)
+        {
+            state = FishingState.FightingFish;
+        }
+    }
 
     // ── FightingFish (placeholder) ───────────────────────────────────────────
-    private void UpdateFightingFish() { /* Phase 6 fills in fight loop */ }
+    private void UpdateFightingFish()
+    {
+        // Phase 6 fills in real fight loop. Phase 5 stub: end immediately as escape.
+        EndFightWithEscape();
+    }
+
+    private void EndFightWithEscape()
+    {
+        SoundEffectManager.Play("FishEscape");
+        CleanupFight();
+        Debug.Log("[Fishing] ESCAPED");
+        state = FishingState.Idle;
+        IsFishing = false;
+        ActiveRod = null;
+        fishingLine.Hide();
+    }
+
+    private void EndFightWithCatch()
+    {
+        if (rolledFish != null)
+        {
+            GameObject prefab = itemDictionary.GetItemPrefab(rolledFish.itemID);
+            if (prefab != null) inventory.AddItem(prefab);
+        }
+        SoundEffectManager.Play("FishCatch");
+        CleanupFight();
+        Debug.Log($"[Fishing] CAUGHT: {rolledFish?.fishName}");
+        state = FishingState.Idle;
+        IsFishing = false;
+        ActiveRod = null;
+        fishingLine.Hide();
+    }
+
+    private void CleanupFight()
+    {
+        if (activeFish != null) Destroy(activeFish.gameObject);
+        if (activeFight != null) Destroy(activeFight);
+        activeFish = null;
+        activeFight = null;
+        rolledFish = null;
+    }
 
     private void EndFishing()
     {
