@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[CreateAssetMenu(menuName = "Fishing/Fishing Tuning", fileName = "FishingTuning")]
 public class FishingTuning : ScriptableObject
 {
     [Header("Cast / charge")]

@@ -463,11 +463,6 @@ MonoBehaviour:
     itemID: 220000
     baseWeight: 60
     rarity: 1
-    phases:
-    - type: 1
-      duration: 10
-      eventInterval: 3
-      possibleEvents: 00000000
     preDawnBonus: 0
     dawnBonus: 0
     dayBonus: 0
@@ -479,11 +474,6 @@ MonoBehaviour:
     itemID: 220001
     baseWeight: 60
     rarity: 2
-    phases:
-    - type: 1
-      duration: 12
-      eventInterval: 4
-      possibleEvents: 0000000001000000
     preDawnBonus: 0
     dawnBonus: 0
     dayBonus: 0
@@ -523,8 +513,6 @@ GameObject:
   - component: {fileID: 105695445}
   - component: {fileID: 105695447}
   - component: {fileID: 105695444}
-  - component: {fileID: 105695443}
-  - component: {fileID: 105695442}
   - component: {fileID: 105695441}
   - component: {fileID: 105695446}
   - component: {fileID: 105695448}
@@ -785,57 +773,11 @@ MonoBehaviour:
   waterLayer:
     serializedVersion: 2
     m_Bits: 16
+  tuning: {fileID: 11400000, guid: d82532a20c6c1f449b83c8c0ef1ee52e, type: 2}
   minCastDistance: 0.5
   chargeRate: 0.8
   maxSpeedMultiplier: 1.5
   castChargeUI: {fileID: 601707414}
---- !u!114 &105695442
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 105695432}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d8643a33e0e6ebe409a15d1cf63f29c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TugMinigame
-  tensionRiseRate: 0.4
-  tensionFallRate: 0.3
-  sweetMin: 0.3
-  sweetMax: 0.7
-  dangerThreshold: 0.8
-  baseDangerTime: 2
-  slackEscapeTime: 3
-  reelFillRate: 0.05
-  reelDrainRate: 0.05
-  baseReactionWindow: 1.2
-  baseTugWindow: 3
-  eventMissPenalty: 0.15
-  reelPerTugClick: 0.04
-  dartHitBoost: 0.08
---- !u!114 &105695443
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 105695432}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d09c47da00e45541bc2f693a56bbd63, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FishBiteDetector
-  minWaitTime: 5
-  maxWaitTime: 20
-  shoreMargin: 4
-  fishBlinkPrefab: {fileID: 632003804025291904, guid: 16f6b1124e5002e43915412253028935, type: 3}
-  blinkInterval: 4
-  spawnRadius: 5
-  blinkRadius: 1.5
-  closeSpawnChance: 0.1
-  firstSpawnDelay: 2
 --- !u!114 &105695444
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34375,65 +34317,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 770263830}
   m_CullTransparentMesh: 1
---- !u!1 &782547580
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 782547581}
-  - component: {fileID: 782547582}
-  m_Layer: 5
-  m_Name: TugMinigameUI
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &782547581
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 782547580}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1020011120}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &782547582
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 782547580}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8eae2f9ac3d9bec4b829436ff6faaf73, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TugMinigameUI
-  panel: {fileID: 2068120696}
-  playerTransform: {fileID: 105695433}
-  headOffset: {x: 0, y: 1.5}
-  tensionBar: {fileID: 1392930593}
-  reelFill: {fileID: 1116938817}
-  dartPrompt: {fileID: 717944954}
-  dartPromptText: {fileID: 1506909688}
-  tugPrompt: {fileID: 814205871}
-  tugPromptText: {fileID: 0}
-  failColor: {r: 1, g: 0, b: 0, a: 1}
-  failFlashDuration: 0.5
 --- !u!1 &791517230
 GameObject:
   m_ObjectHideFlags: 0
@@ -36081,7 +35964,6 @@ RectTransform:
   - {fileID: 2089495815}
   - {fileID: 318521789}
   - {fileID: 674888037}
-  - {fileID: 782547581}
   - {fileID: 2043192726}
   - {fileID: 1031068962}
   m_Father: {fileID: 0}
@@ -37658,22 +37540,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 36a955dd85b7f684db3d2a5348d9c49f, type: 3}
---- !u!224 &1392930592 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 8084664153539797876, guid: 842b700e2ccd0774d901fd5766af1a14, type: 3}
-  m_PrefabInstance: {fileID: 4863948256148236830}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1392930593 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4504807442064837276, guid: 842b700e2ccd0774d901fd5766af1a14, type: 3}
-  m_PrefabInstance: {fileID: 4863948256148236830}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 72712cc524b51f6408cd0e9794ef4c19, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FillBarController
 --- !u!1 &1422250200
 GameObject:
   m_ObjectHideFlags: 0
@@ -97444,7 +97310,6 @@ RectTransform:
   - {fileID: 1116938819}
   - {fileID: 717944955}
   - {fileID: 814205874}
-  - {fileID: 1392930592}
   m_Father: {fileID: 1020011120}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -97784,107 +97649,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2147216393}
   m_CullTransparentMesh: 1
---- !u!1001 &4863948256148236830
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 2068120697}
-    m_Modifications:
-    - target: {fileID: 2257199635479880703, guid: 842b700e2ccd0774d901fd5766af1a14, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4423496340660105019, guid: 842b700e2ccd0774d901fd5766af1a14, type: 3}
-      propertyPath: m_Name
-      value: TensionBar_Panel
-      objectReference: {fileID: 0}
-    - target: {fileID: 8084664153539797876, guid: 842b700e2ccd0774d901fd5766af1a14, type: 3}
-      propertyPath: m_Pivot.x
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8084664153539797876, guid: 842b700e2ccd0774d901fd5766af1a14, type: 3}
-      propertyPath: m_Pivot.y
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8084664153539797876, guid: 842b700e2ccd0774d901fd5766af1a14, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8084664153539797876, guid: 842b700e2ccd0774d901fd5766af1a14, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8084664153539797876, guid: 842b700e2ccd0774d901fd5766af1a14, type: 3}
-      propertyPath: m_AnchorMin.x
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8084664153539797876, guid: 842b700e2ccd0774d901fd5766af1a14, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8084664153539797876, guid: 842b700e2ccd0774d901fd5766af1a14, type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 200
-      objectReference: {fileID: 0}
-    - target: {fileID: 8084664153539797876, guid: 842b700e2ccd0774d901fd5766af1a14, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 20
-      objectReference: {fileID: 0}
-    - target: {fileID: 8084664153539797876, guid: 842b700e2ccd0774d901fd5766af1a14, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8084664153539797876, guid: 842b700e2ccd0774d901fd5766af1a14, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8084664153539797876, guid: 842b700e2ccd0774d901fd5766af1a14, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8084664153539797876, guid: 842b700e2ccd0774d901fd5766af1a14, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8084664153539797876, guid: 842b700e2ccd0774d901fd5766af1a14, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8084664153539797876, guid: 842b700e2ccd0774d901fd5766af1a14, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8084664153539797876, guid: 842b700e2ccd0774d901fd5766af1a14, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8084664153539797876, guid: 842b700e2ccd0774d901fd5766af1a14, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 38
-      objectReference: {fileID: 0}
-    - target: {fileID: 8084664153539797876, guid: 842b700e2ccd0774d901fd5766af1a14, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8084664153539797876, guid: 842b700e2ccd0774d901fd5766af1a14, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8084664153539797876, guid: 842b700e2ccd0774d901fd5766af1a14, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8084664153539797876, guid: 842b700e2ccd0774d901fd5766af1a14, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 842b700e2ccd0774d901fd5766af1a14, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
