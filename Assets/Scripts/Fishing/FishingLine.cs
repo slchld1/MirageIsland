@@ -11,15 +11,6 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(LineRenderer))]
 public class FishingLine : MonoBehaviour
 {
-    [Header("Nudge")]
-    public float nudgeSpeed = 1f;
-    [Tooltip("How far the bobber can move from the player via Q/E nudge")]
-    [SerializeField] private float maxNudgeDistance = 0.3f;
-
-    [Header("Proximity")]
-    [Tooltip("Max catch-rate bonus at closest range (e.g. 0.2 = +20% speed)")]
-    public float maxProximityBonus = 0.2f;
-    public float proximityRange = 2f;
 
     [Header("Rod Tip")]
     [Tooltip("The HoldPoint transform from HeldItemRenderer — line starts here + rod's tipOffset.")]
@@ -38,10 +29,6 @@ public class FishingLine : MonoBehaviour
     private GameObject bobberInstance;
 
     public Vector2 BobPosition => bobPosition;
-    public bool NudgeEnabled { get; set; } = true;
-
-    // Set externally by FishBiteDetector when a blink spawns
-    public Vector2 LastBlinkPosition { get; set; }
 
     private void Awake()
     {
@@ -71,7 +58,6 @@ public class FishingLine : MonoBehaviour
     {
         castPoint    = castTarget;
         bobPosition  = RodTipPosition; // start at rod tip
-        LastBlinkPosition = castTarget;
         lineRenderer.enabled = true;
         SpawnBobber();
         StartCoroutine(CastRoutine(castTarget, speed, onLanded));
@@ -110,27 +96,7 @@ public class FishingLine : MonoBehaviour
 
     private void Update()
     {
-        if (!lineRenderer.enabled) return;
 
-        float nudge = 0f;
-        if (NudgeEnabled)
-        {
-            if (Keyboard.current.qKey.isPressed) nudge = -1f;
-            else if (Keyboard.current.eKey.isPressed) nudge = 1f;
-        }
-
-        if (nudge != 0f)
-        {
-            bobPosition += Vector2.right * nudge * nudgeSpeed * Time.deltaTime;
-            // Clamp so the bobber stays within maxNudgeDistance of the original cast point
-            float offset = Mathf.Clamp(bobPosition.x - castPoint.x, -maxNudgeDistance, maxNudgeDistance);
-            bobPosition = new Vector2(castPoint.x + offset, castPoint.y);
-            UpdateLine();
-        }
-
-        // Keep bobber sitting on the bob position
-        if (bobberInstance != null)
-            bobberInstance.transform.position = bobPosition;
     }
 
     private void SpawnBobber()
@@ -161,10 +127,4 @@ public class FishingLine : MonoBehaviour
         Gizmos.DrawSphere(RodTipPosition, 0.05f);
     }
 
-    public float GetProximityBonus()
-    {
-        float dist = Vector2.Distance(bobPosition, LastBlinkPosition);
-        float t = 1f - Mathf.Clamp01(dist / proximityRange);
-        return t * maxProximityBonus;
-    }
 }
