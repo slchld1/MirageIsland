@@ -24,15 +24,6 @@ public class FishingController : MonoBehaviour
     public FishingTuning tuning;
 
     [Header("Cast Charge")]
-    [Tooltip("Shortest cast distance at zero charge (world units)")]
-    public float minCastDistance = 0.5f;
-
-    [Tooltip("Oscillation speed — full cycles (0→1→0) per second")]
-    public float chargeRate = 0.8f;
-
-    [Tooltip("Cast speed multiplier at full charge, relative to rod.castSpeed")]
-    public float maxSpeedMultiplier = 1.5f;
-
     [SerializeField] private CastChargeUI castChargeUI;
 
     public FishingRod ActiveRod { get; private set; }
@@ -109,10 +100,10 @@ public class FishingController : MonoBehaviour
         dir = dir.normalized;
 
         float maxDist  = ActiveRod != null ? ActiveRod.castDistance : 3f;
-        float castDist = Mathf.Lerp(minCastDistance, maxDist, charge);
+        float castDist = Mathf.Lerp(tuning.minCastDistance, maxDist, charge);
 
         float baseSpeed = ActiveRod != null ? ActiveRod.castSpeed : 6f;
-        float castSpeed = Mathf.Lerp(baseSpeed, baseSpeed * maxSpeedMultiplier, charge);
+        float castSpeed = Mathf.Lerp(baseSpeed, baseSpeed * tuning.maxSpeedMultiplier, charge);
 
         Vector2 target = playerPos + dir * castDist;
 
@@ -169,7 +160,7 @@ public class FishingController : MonoBehaviour
         }
 
         // Oscillate charge 0 → 1 → 0 → ...
-        chargeLevel += chargeDir * chargeRate * Time.deltaTime;
+        chargeLevel += chargeDir * tuning.chargeOscillationRate * Time.deltaTime;
         if (chargeLevel >= 1f) { chargeLevel = 1f; chargeDir = -1f; }
         else if (chargeLevel <= 0f) { chargeLevel = 0f; chargeDir =  1f; }
 
