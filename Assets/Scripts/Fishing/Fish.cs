@@ -1,91 +1,99 @@
 using System.Collections;
 using UnityEngine;
 
+public enum FishState
+{
+    BiteFlee,       // 0.45s scripted opening
+    Following,
+    Resting,
+    DartingLeft,
+    DartingRight,
+    DartingOut
+}
 /// <summary>
-/// A persistent fish that swims left/right only toward a target X position.
-/// Stays invisible most of the time and briefly pulses visible on command.
-/// Managed entirely by FishBiteDetector — do not destroy manually.
-/// Requires a SpriteRenderer on the same GameObject.
+/// Hooked fish. Owns its own state machine, stamina, and sprite facing.
+/// Phase 5: only BiteFlee state is implemented; others are stubbed for Phase 6.
 /// </summary>
 public class Fish : MonoBehaviour
 {
-    [Tooltip("Slowest swim speed when far from the bob")]
-    public float minSwimSpeed = 0.5f;
-    [Tooltip("Fastest swim speed when close to the bob")]
-    public float maxSwimSpeed = 2.5f;
-    [Tooltip("Distance at which the fish reaches max speed")]
-    public float approachDistance = 2f;
+    public FishData data;
+    public SpriteRenderer body;
 
-    private SpriteRenderer sr;
-    private float targetX;
-    private float targetY;
-    private bool pulsing;
+    private FishingTuning tuning;
+    private FightArena arena;
+    private FishingFight fight;
+    private FishState state = FishState.BiteFlee;
+    private float stamina;
+    private float stateTimer;
+    private Vector2 biteFleeDir;
 
-    private void Awake()
+    public FishState State => state;
+    public bool IsBiteFleeing => state == FishState.BiteFlee;
+
+    public void Init(FishData d, FightArena a, FishingTuning t, FishingFight f, Vector2 lurePos)
     {
-        sr = GetComponent<SpriteRenderer>();
-        SetAlpha(0f); // invisible until pulsed
-    }
+        data = d;
+        arena = a;
+        tuning = t;
+        fight = f;
+        transform.position = lurePos;
 
-    /// <summary>
-    /// Called each frame by FishBiteDetector to update where the fish is swimming toward.
-    /// </summary>
-    public void SetTarget(Vector2 target)
-    {
-        float dir = target.x - transform.position.x;
-        if (Mathf.Abs(dir) > 0.01f)
+        int rarity = (d != null) ? Mathf.Max(1, d.rarity) : 1;
+        stamina = tuning.fishStaminaMaxBase + tuning.fishStaminaMaxPerRarity * (rarity - 1);
+
+        // Pick a random bite-flee direction: lateral OR angled-out, no screen-edge bias.
+        bool lateralPick = Random.value < 0.6f;
+        if (lateralPick)
+            biteFleeDir = arena.lateral * (Random.value < 0.5f ? -1f : 1f);
+        else
         {
-            Vector3 s = transform.localScale;
-            s.x = Mathf.Abs(s.x) * (dir > 0f ? 1f : -1f);
-            transform.localScale = s;
+            float lateralSign = Random.value < 0.5f ? -1f : 1f;
+            biteFleeDir = (arena.outward + arena.lateral * lateralSign * 0.5f).normalized;
         }
-        targetX = target.x;
-        targetY = target.y;
+        stateTimer = tuning.biteFleeDuration;
+
+        FaceAwayFromPlayer();
     }
 
-    // Keep old method so nothing else breaks
-    public void SetTargetX(float x) => SetTarget(new Vector2(x, targetY));
-
-    private void Update()
+    public void Tick(float dt)
     {
-        // Accelerate as the fish closes in on the bob — slow approach, fast commit
-        float dist = Vector2.Distance(transform.position, new Vector2(targetX, targetY));
-        float t = 1f - Mathf.Clamp01(dist / approachDistance);
-        float speed = Mathf.Lerp(minSwimSpeed, maxSwimSpeed, t);
-
-        Vector2 newPos = Vector2.MoveTowards(transform.position, new Vector2(targetX, targetY), speed * Time.deltaTime);
-        transform.position = new Vector3(newPos.x, newPos.y, transform.position.z);
-    }
-
-    /// <summary>
-    /// Briefly flashes the fish visible then invisible. Safe to call while already pulsing.
-    /// </summary>
-    public void Pulse(float duration = 0.8f)
-    {
-        if (!pulsing)
-            StartCoroutine(PulseRoutine(duration));
-    }
-
-    private IEnumerator PulseRoutine(float duration)
-    {
-        pulsing = true;
-        float timer = 0f;
-        while (timer < duration)
+        switch (state)
         {
-            timer += Time.deltaTime;
-            float t = timer / duration;
-            SetAlpha(t < 0.5f ? t * 2f : (1f - t) * 2f);
-            yield return null;
+            case FishState.BiteFlee: TickBiteFlee(dt); break;
+                // Phase 6 fills in Following/Resting/Darting* branches
         }
-        SetAlpha(0f);
-        pulsing = false;
+        UpdateSpriteFacing();
     }
 
-    private void SetAlpha(float a)
+    private void TickBiteFlee(float dt)
     {
-        if (sr == null) return;
-        Color c = sr.color;
-        c.a = a;
-        sr.color = c;
+        Vector2 step = biteFleeDir * tuning.biteFleeFollowSpeed * dt;
+        transform.position += (Vector3)step;
+
+        stateTimer -= dt;
+        if (stateTimer <= 0f) EnterFollowing();
     }
+
+    private void EnterFollowing()
+    {
+        state = FishState.Following;
+        stateTimer = 0f;
+    }
+
+    private void FaceAwayFromPlayer()
+    {
+        Vector2 toPlayer = arena.playerAnchor - (Vector2)transform.position;
+        float angle = Mathf.Atan2(toPlayer.y, toPlayer.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0f, 0f, angle + 180f);
+    }
+
+    private void UpdateSpriteFacing()
+    {
+        // Phase 8 fills in dart tilt + near-shore flip.
+        FaceAwayFromPlayer();
+    }
+
+    public Vector2 PositionOnLure() => transform.position;
+    public Vector2 BiteFleeDirection => biteFleeDir;
 }
+
