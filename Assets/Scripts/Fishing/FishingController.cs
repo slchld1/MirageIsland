@@ -35,7 +35,8 @@ public class FishingController : MonoBehaviour
     private FishingLine       fishingLine;
 
     private FishingState state     = FishingState.Idle;
-    private FishData     rolledFish;
+    private FightArena arena;
+    private FishData rolledFish;
     private float chargeLevel;
     private float chargeDir = 1f;
 
@@ -125,7 +126,19 @@ public class FishingController : MonoBehaviour
         Collider2D hit = Physics2D.OverlapPoint(fishingLine.BobPosition, waterLayer);
         if (hit == null) { EndFishing(); return; }
 
-        // add FightingArena.Snapshot here
+        arena = FightArena.Snapshot(
+            playerAnchor: transform.position,
+            castOrigin: fishingLine.RodTipPosition,
+            lurePosAtLand: fishingLine.BobPosition,
+            tuning: tuning,
+            waterLayer: waterLayer);
+
+        if (!arena.IsValid)
+        {
+            EndFishing();
+            return;
+        }
+
         lureSubMode = LureSubMode.Stationary;
         lureInWaterTimer = 3f;
         state = FishingState.LureInWater;

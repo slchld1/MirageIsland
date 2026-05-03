@@ -73,7 +73,7 @@ public struct FightArena
         // Cast-land guard: arena would alredy be inside catch range
         if (a.maxOutward < tuning.shoreCatchThreshold + tuning.reelStartBuffer) return a;
 
-        // Centerline land check: sample from playerAnchor toward lurePosAtLand
+/*        // Centerline land check: sample from playerAnchor toward lurePosAtLand
         if (CenterlineHitsLand(a, tuning.landSampleDensity, waterLayer)) return a;
 
         // Symmetrically shrink lateralHalfW until both lateral escape lines are water-clean
@@ -83,7 +83,7 @@ public struct FightArena
             if (LateralLinesAreWaterClean(a, tuning.landSampleDensity, waterLayer)) break;
             a.lateralHalfW -= tuning.lateralShrinkStep;
         }
-        if (a.lateralHalfW < tuning.minLateralHalfWidth) return a;
+        if (a.lateralHalfW < tuning.minLateralHalfWidth) return a;*/
 
         a.IsValid = true;
         return a;
@@ -91,26 +91,38 @@ public struct FightArena
 
     private static bool CenterlineHitsLand(FightArena a, int samples, LayerMask waterLayer)
     {
+        // Walk from lurePosAtLand (known water) toward playerAnchor (likely land).
+        // Allow one transition water -> land. Reject if we re-enter water (= island/peninsula in the path).
+        bool leftWater = false;
         for (int i = 0; i <= samples; i++)
         {
             float t = i / (float)samples;
-            Vector2 p = Vector2.Lerp(a.playerAnchor, a.lurePosAtLand, t);
-            if (Physics2D.OverlapPoint(p, waterLayer) == null) return true;
+            Vector2 p = Vector2.Lerp(a.lurePosAtLand, a.playerAnchor, t);
+            bool isWater = Physics2D.OverlapPoint(p, waterLayer) != null;
+            if (!isWater) leftWater = true;
+            else if (leftWater) return true; // re-entered water after leaving it
         }
         return false;
     }
 
     private static bool LateralLinesAreWaterClean(FightArena a, int samples, LayerMask waterLayer)
     {
-        // Left and right escape lines run from (outward=0, lateral=±halfW) to (outward=maxOutward, lateral=±halfW)
+        // Each lateral wall runs from (outward=0, lateral=±halfW) to (outward=maxOutward, lateral=±halfW).
+        // Walk from far end (maxOutward) toward near end (0).
+        // Allow one water -> land transition; reject if water reappears after leaving it.
         for (int side = -1; side <= 1; side += 2)
         {
+            bool leftWater = false;
             for (int i = 0; i <= samples; i++)
             {
                 float t = i / (float)samples;
-                Vector2 local = new Vector2(t * a.maxOutward, side * a.lateralHalfW);
+                // Note: t=0 starts at the FAR end (outward=maxOutward), t=1 at near end (outward=0)
+                float outwardT = (1f - t) * a.maxOutward;
+                Vector2 local = new Vector2(outwardT, side * a.lateralHalfW);
                 Vector2 world = a.LocalToWorld(local);
-                if (Physics2D.OverlapPoint(world, waterLayer) == null) return false;
+                bool isWater = Physics2D.OverlapPoint(world, waterLayer) != null;
+                if (!isWater) leftWater = true;
+                else if (leftWater) return false; // wall punches through land back into water
             }
         }
         return true;
