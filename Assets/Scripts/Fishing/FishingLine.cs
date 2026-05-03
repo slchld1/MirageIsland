@@ -106,7 +106,7 @@ public class FishingLine : MonoBehaviour
         bobberInstance = Instantiate(bobberPrefab, bobPosition, Quaternion.identity);
     }
 
-    private Vector3 RodTipPosition
+    public Vector3 RodTipPosition
     {
         get
         {
@@ -127,4 +127,10 @@ public class FishingLine : MonoBehaviour
         Gizmos.DrawSphere(RodTipPosition, 0.05f);
     }
 
+    public void SetBobPosition(Vector2 worldPos)
+    {
+        bobPosition = worldPos;
+        if (bobberInstance != null) bobberInstance.transform.position = worldPos;
+        UpdateLine();
+    }
 }

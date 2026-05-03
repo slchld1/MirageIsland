@@ -7,7 +7,7 @@ using UnityEngine;
 /// Managed entirely by FishBiteDetector — do not destroy manually.
 /// Requires a SpriteRenderer on the same GameObject.
 /// </summary>
-public class FishBlink : MonoBehaviour
+public class Fish : MonoBehaviour
 {
     [Tooltip("Slowest swim speed when far from the bob")]
     public float minSwimSpeed = 0.5f;
