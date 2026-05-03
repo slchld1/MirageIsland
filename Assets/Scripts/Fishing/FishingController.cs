@@ -40,6 +40,8 @@ public class FishingController : MonoBehaviour
     private float chargeLevel;
     private float chargeDir = 1f;
 
+    private LureReeler lureReeler;
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -49,6 +51,7 @@ public class FishingController : MonoBehaviour
         inventory        = FindAnyObjectByType<Inventory>();
         itemDictionary   = FindAnyObjectByType<ItemDictionary>();
         fishingLine      = GetComponent<FishingLine>();
+        lureReeler       = GetComponent<LureReeler>();
 
     }
 
@@ -139,8 +142,8 @@ public class FishingController : MonoBehaviour
             return;
         }
 
+        lureReeler.Begin(arena, tuning);
         lureSubMode = LureSubMode.Stationary;
-        lureInWaterTimer = 3f;
         state = FishingState.LureInWater;
     }
 
@@ -201,11 +204,84 @@ public class FishingController : MonoBehaviour
     // ── LureInWater (STUB — Phase 2) ─────────────────────────────────────────
     private void UpdateLureInWater()
     {
-        // Phase 2 stub: just count down 3 seconds and end fishing. Phases 3+ replace this.
-        lureInWaterTimer -= Time.deltaTime;
-        if (lureInWaterTimer <= 0f) EndFishing();
+        bool lmbHeld = Mouse.current.leftButton.isPressed;
+        bool shiftHeld = Keyboard.current?.leftShiftKey.isPressed ?? false;
+
+        // Sub-mode transition driven by LMB
+        lureSubMode = lmbHeld ? LureSubMode.Reeling : LureSubMode.Stationary;
+
+        float waitMult = ActiveBaitWaitMultiplier();
+        float reelMult = ActiveBaitReelMultiplier();
+
+        if (lureSubMode == LureSubMode.Stationary)
+        {
+            float p = tuning.waitHookChancePerSecond * waitMult * Time.deltaTime;
+            if (Random.value < p) { OnFishHooked(); return; }
+        }
+        else // Reeling
+        {
+            float pxReeled = lureReeler.Tick(lmbHeld, shiftHeld);
+            float p = tuning.reelHookChancePerPixel * pxReeled * reelMult;
+            if (Random.value < p)
+            {
+                Debug.Log($"[Fishing] Stationary hit (p={p:F4})");
+                OnFishHooked();
+                return;
+            }
+            // Empty reel-back end-of-cast
+            if (lureReeler.IsAtShore()) { EndFishing(); return; }
+        }
     }
 
+    private float ActiveBaitWaitMultiplier()
+    {
+        Bait bait = ActiveBait();
+        return bait != null ? bait.waitHookMultiplier : 1f;
+    }
+
+    private float ActiveBaitReelMultiplier()
+    {
+        Bait bait = ActiveBait();
+        return bait != null ? bait.reelHookMultiplier : 1f;
+    }
+
+    private Bait ActiveBait()
+    {
+        if (ActiveRod == null || ActiveRod.equippedBait == BaitType.None) return null;
+        if (itemDictionary == null) return null;
+
+        foreach (Item item in itemDictionary.itemPrefabs)
+        {
+            Bait bait = item as Bait;
+            if (bait != null && bait.baitType == ActiveRod.equippedBait) return bait;
+        }
+        return null;
+
+    }
+
+
+    private void OnFishHooked()
+    {
+        Debug.Log($"[Fishing] HOOKED via {lureSubMode}. Bait left: {(ActiveRod != null ? ActiveRod.baitCount : 0)}");
+        // Bait consumed on hook (NOT on cast)
+        if (ActiveRod != null && ActiveRod.equippedBait != BaitType.None)
+        {
+            ActiveRod.baitCount--;
+            if (ActiveRod.baitCount <= 0)
+            {
+                ActiveRod.baitCount = 0;
+                ActiveRod.equippedBait = BaitType.None;
+            }
+        }
+
+        lureReeler.Stop();
+        state = FishingState.FishHooked;
+        SoundEffectManager.Play("FishBite");
+
+        // Phase 5 replaces this with the bite-flee opening + transition to FightingFish.
+        // Phase 4 stub: end fishing immediately.
+        EndFishing();
+    }
     // ── FishHooked (placeholder) ─────────────────────────────────────────────
     private void UpdateFishHooked() { /* Phase 5 fills in bite-flee opening */ }
 
@@ -214,10 +290,38 @@ public class FishingController : MonoBehaviour
 
     private void EndFishing()
     {
+        Debug.Log($"[Fishing] END from state={state}");
         castChargeUI?.Hide();
         fishingLine.Hide();
         state = FishingState.Idle;
         IsFishing = false;
         ActiveRod = null;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        if (!arena.IsValid) return;
+
+        // Centerline (player → lure landing)
+        Gizmos.color = Color.cyan;
+        Vector2 forward = arena.playerAnchor + arena.outward * arena.maxOutward;
+        Gizmos.DrawLine(arena.playerAnchor, forward);
+
+        // Outward escape line (far edge of arena)
+        Vector2 outFar = forward;
+        Vector2 outLeft = outFar + arena.lateral * -arena.lateralHalfW;
+        Vector2 outRight = outFar + arena.lateral * arena.lateralHalfW;
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(outLeft, outRight);
+
+        // Lateral escape lines (left + right walls)
+        Vector2 leftNear = arena.playerAnchor + arena.lateral * -arena.lateralHalfW;
+        Vector2 rightNear = arena.playerAnchor + arena.lateral * arena.lateralHalfW;
+        Gizmos.DrawLine(leftNear, outLeft);
+        Gizmos.DrawLine(rightNear, outRight);
+
+        // Catch zone (around player anchor)
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(arena.playerAnchor, tuning != null ? tuning.shoreCatchThreshold : 0.5f);
     }
 }
