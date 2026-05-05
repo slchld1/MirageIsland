@@ -76,8 +76,9 @@ public class Fish : MonoBehaviour
 
     private void TickBiteFlee(float dt)
     {
-        Vector2 step = biteFleeDir * tuning.biteFleeFollowSpeed * dt;
-        transform.position += (Vector3)step;
+        Vector2 cur = transform.position;
+        Vector2 desired = cur + biteFleeDir * tuning.biteFleeFollowSpeed * dt;
+        transform.position = SlideToWater(cur, desired);
 
         stateTimer -= dt;
         if (stateTimer <= 0f) EnterFollowing();
@@ -86,20 +87,19 @@ public class Fish : MonoBehaviour
     private void TickFollowing(float dt)
     {
         Vector2 lurePos = fight.GetLureWorld();
-        Vector2 toLure = lurePos - (Vector2)transform.position;
+        Vector2 cur = transform.position;
+        Vector2 toLure = lurePos - cur;
         float step = tuning.followSpeed * dt;
-        if (toLure.magnitude > step)
-        {
-            transform.position += (Vector3)(toLure.normalized * step);
-        }
-        else
-        {
-            transform.position = lurePos;
-        }
+
+        Vector2 desired = (toLure.magnitude > step)
+            ? cur + toLure.normalized * step
+            : lurePos;
+        transform.position = SlideToWater(cur, desired);
+
         stamina = Mathf.Min(MaxStamina(), stamina + tuning.staminaRegenWhileFollowing * dt);
 
         int rarity = (data != null) ? Mathf.Max(1, data.rarity) : 1;
-        float dartChance = tuning.baseDartChance * (1f + 0.20f * (rarity - 1) * dt);
+        float dartChance = tuning.baseDartChance * (1f + 0.20f * (rarity - 1)) * dt;
         if (Random.value < dartChance && stamina >= tuning.dartStaminaCost)
         {
             EnterDart();
@@ -116,19 +116,18 @@ public class Fish : MonoBehaviour
     private void TickDart(float dt)
     {
         Vector2 lurePos = fight.GetLureWorld();
-        Vector2 toLure = lurePos - (Vector2)transform.position;
+        Vector2 cur = transform.position;
+        Vector2 toLure = lurePos - cur;
         float step = tuning.followSpeed * 1.5f * dt;
-        if (toLure.magnitude > step)
-        {
-            transform.position += (Vector3)(toLure.normalized * step);
-        }
-        else
-        {
-            transform.position = lurePos;
-        }
+
+        Vector2 desired = (toLure.magnitude > step)
+            ? cur + toLure.normalized * step
+            : lurePos;
+        transform.position = SlideToWater(cur, desired);
+
         stateTimer -= dt;
         if (stateTimer <= 0f)
-        { 
+        {
             stamina -= tuning.dartStaminaCost;
             EnterResting();
         }
@@ -186,5 +185,17 @@ public class Fish : MonoBehaviour
     }
 
     public Vector2 PositionOnLure() => transform.position;
+
+    private Vector2 SlideToWater(Vector2 current, Vector2 desired)
+    {
+        if (Physics2D.OverlapPoint(desired, tuning.waterLayerMask) != null) return desired;
+        Vector2 slideX = new Vector2(desired.x, current.y);
+        if (Physics2D.OverlapPoint(slideX, tuning.waterLayerMask) != null) return slideX;
+        Vector2 slideY = new Vector2(current.x, desired.y);
+        if (Physics2D.OverlapPoint(slideY, tuning.waterLayerMask) != null) return slideY;
+        return current;
+    }
+
+
 }
 
