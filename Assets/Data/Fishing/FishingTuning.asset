@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c71219a82941a44a8b8eadbfc775b0e, type: 3}
   m_Name: FishingTuning
   m_EditorClassIdentifier: Assembly-CSharp::FishingTuning
-  minCastDistance: 2
+  minCastDistance: 4
   chargeOscillationRate: 0.8
   maxSpeedMultiplier: 1.5
   waitHookChancePerSecond: 0.06
@@ -55,3 +55,13 @@ MonoBehaviour:
   biteFleeInputDamp: 0.3
   biteFleeTensionPunch: 50
   playerMoveCancelDistance: 0.1
+  greenAngleDeg: 45
+  greenRadiusBuffer: 1.5
+  outOfZoneTensionRate: 30
+  catchFillRate: 0.5
+  catchDecayRate: 0.1
+  lureDampingPerFrame: 0.92
+  minRadius: 0.5
+  waterLayerMask:
+    serializedVersion: 2
+    m_Bits: 16

@@ -307,7 +307,7 @@ public class FishingController : MonoBehaviour
     private void UpdateFishHooked() 
     {
         activeFish.Tick(Time.deltaTime);
-        activeFight.Tick(Time.deltaTime, dampedInput: true);
+        activeFight.Tick(Time.deltaTime);
 
         if (!activeFish.IsBiteFleeing)
         {
@@ -318,8 +318,8 @@ public class FishingController : MonoBehaviour
     // ── FightingFish (placeholder) ───────────────────────────────────────────
     private void UpdateFightingFish()
     {
-        // Phase 6 fills in real fight loop. Phase 5 stub: end immediately as escape.
-        EndFightWithEscape();
+        activeFish.Tick(Time.deltaTime);
+        activeFight.Tick(Time.deltaTime);
     }
 
     private void EndFightWithEscape()
@@ -349,6 +349,16 @@ public class FishingController : MonoBehaviour
         fishingLine.Hide();
     }
 
+    public void NotifyEscape()
+    {
+        EndFightWithEscape();
+    }
+
+    public void NotifyCatch()
+    {
+        EndFightWithCatch();
+    }
+
     private void CleanupFight()
     {
         if (activeFish != null) Destroy(activeFish.gameObject);
@@ -372,26 +382,45 @@ public class FishingController : MonoBehaviour
     {
         if (!arena.IsValid) return;
 
-        // Centerline (player → lure landing)
+        Vector2 anchor = arena.playerAnchor;
+
+        // Centerline (player -> cast landing)
         Gizmos.color = Color.cyan;
-        Vector2 forward = arena.playerAnchor + arena.outward * arena.maxOutward;
-        Gizmos.DrawLine(arena.playerAnchor, forward);
+        Gizmos.DrawLine(anchor, anchor + arena.castDir * arena.castLandRadius);
 
-        // Outward escape line (far edge of arena)
-        Vector2 outFar = forward;
-        Vector2 outLeft = outFar + arena.lateral * -arena.lateralHalfW;
-        Vector2 outRight = outFar + arena.lateral * arena.lateralHalfW;
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(outLeft, outRight);
-
-        // Lateral escape lines (left + right walls)
-        Vector2 leftNear = arena.playerAnchor + arena.lateral * -arena.lateralHalfW;
-        Vector2 rightNear = arena.playerAnchor + arena.lateral * arena.lateralHalfW;
-        Gizmos.DrawLine(leftNear, outLeft);
-        Gizmos.DrawLine(rightNear, outRight);
-
-        // Catch zone (around player anchor)
+        // Greenzone sector
         Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(arena.playerAnchor, tuning != null ? tuning.shoreCatchThreshold : 0.5f);
+        const int sectorSegments = 24;
+        Vector2 prevArc = anchor + RotateVec(arena.castDir, -arena.greenAngleDeg) * arena.greenMaxRadius;
+        Gizmos.DrawLine(anchor, prevArc); // first edge ray
+        for (int i = 1; i <= sectorSegments; i++)
+        {
+            float t = (float)i / sectorSegments;
+            float deg = Mathf.Lerp(-arena.greenAngleDeg, arena.greenAngleDeg, t);
+            Vector2 next = anchor + RotateVec(arena.castDir, deg) * arena.greenMaxRadius;
+            Gizmos.DrawLine(prevArc, next);
+            prevArc = next;
+        }
+        Gizmos.DrawLine(prevArc, anchor); // closing edge ray
+
+        // Inner refernce radius
+        Gizmos.color = Color.yellow;
+        const int innerSegments = 24;
+        Vector2 prevInner = anchor + Vector2.right * arena.minRadius;
+        for (int i = 1; i <= innerSegments; i++)
+        {
+            float a = (i / (float)innerSegments) * Mathf.PI * 2f;
+            Vector2 next = anchor + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * arena.minRadius;
+            Gizmos.DrawLine(prevArc, next);
+            prevInner = next;
+        }
+    }
+
+    private static Vector2 RotateVec(Vector2 v, float deg)
+    {
+        float r = deg * Mathf.Deg2Rad;
+        float c = Mathf.Cos(r);
+        float s = Mathf.Sin(r);
+        return new Vector2(v.x * c - v.y * s, v.x * s + v.y * c);
     }
 }

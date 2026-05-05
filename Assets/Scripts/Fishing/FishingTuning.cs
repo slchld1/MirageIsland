@@ -64,5 +64,29 @@ public class FishingTuning : ScriptableObject
     [Header("Forced cancel")]
     public float playerMoveCancelDistance = 0.1f;
 
+    [Header("Polar arena (revision 2026-05-03)")]
+    [Tooltip("Half-angle of the greenzone sector, degrees. Lure outside |angle| > this builds tension.")]
+    public float greenAngleDeg = 45f;
 
+    [Tooltip("Greenzone extends this far past castLandRadius (units). Lure outside builds tension.")]
+    public float greenRadiusBuffer = 1.5f;
+
+    [Tooltip("Tension/sec added when lure is just outside greenzone. Scales up with severity.")]
+    public float outOfZoneTensionRate = 30f;
+
+    [Tooltip("Catch progress per second when centeringScore = 1.0 (perfectly centered + reeled in).")]
+    public float catchFillRate = 0.5f;
+
+    [Tooltip("Catch progress drained per second while fish is darting (any dart state).")]
+    public float catchDecayRate = 0.1f;
+
+    [Tooltip("Per-frame velocity damping for lure inertia. 0.92 = ~8% bleed per frame.")]
+    public float lureDampingPerFrame = 0.92f;
+
+    [Tooltip("Inner reference radius (units). Lure cannot meaningfully come closer than this.")]
+    public float minRadius = 0.5f;
+
+    [Header("Land detection")]
+    [Tooltip("Layer mask for water tiles. Used to clamp fish + lure off land. Match the cast lander mask.")]
+    public LayerMask waterLayerMask;
 }

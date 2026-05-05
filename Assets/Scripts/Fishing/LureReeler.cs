@@ -34,7 +34,7 @@ public class LureReeler : MonoBehaviour
         float unitsThisFrame = pxThisFrame / 16f; // 16 PPU
 
         Vector2 cur = fishingLine.BobPosition;
-        Vector2 inward = -arena.outward * unitsThisFrame;
+        Vector2 inward = -arena.castDir * unitsThisFrame;
         Vector2 next = cur + inward;
         fishingLine.SetBobPosition(next);
 
