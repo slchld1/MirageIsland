@@ -99,7 +99,7 @@ public class FishingFight : MonoBehaviour
             }
             else
             {
-                Vector2 slideX = new Vector2(desiredPos.x, desiredPos.y);
+                Vector2 slideX = new Vector2(desiredPos.x, currentPos.y);
                 if (Physics2D.OverlapPoint(slideX, tuning.waterLayerMask) != null)
                 {
                     finalPos = slideX;
