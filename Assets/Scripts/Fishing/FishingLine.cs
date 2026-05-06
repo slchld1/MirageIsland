@@ -59,6 +59,7 @@ public class FishingLine : MonoBehaviour
         castPoint    = castTarget;
         bobPosition  = RodTipPosition; // start at rod tip
         lineRenderer.enabled = true;
+        SetTensionColor(0f);
         SpawnBobber();
         StartCoroutine(CastRoutine(castTarget, speed, onLanded));
     }
@@ -132,5 +133,15 @@ public class FishingLine : MonoBehaviour
         bobPosition = worldPos;
         if (bobberInstance != null) bobberInstance.transform.position = worldPos;
         UpdateLine();
+    }
+
+    public void SetTensionColor(float t01)
+    {
+        t01 = Mathf.Clamp01(t01);
+        Color c = (t01 < 0.5f)
+            ? Color.Lerp(Color.green, Color.yellow, t01 * 2f)
+            : Color.Lerp(Color.yellow, Color.red, (t01 - 0.5f) * 2f);
+        lineRenderer.startColor = c;
+        lineRenderer.endColor = c;
     }
 }

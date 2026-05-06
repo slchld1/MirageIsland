@@ -46,6 +46,7 @@ public class FishingFight : MonoBehaviour
             line.SetBobPosition(fish.PositionOnLure());
             lureVelocity = Vector2.zero;
             tension = Mathf.Max(0f, tension - tuning.tensionDecayPerSecond * dt);
+            line.SetTensionColor(tension / Mathf.Max(0.01f, tuning.tensionMax));
             return;
         }
 
@@ -139,6 +140,7 @@ public class FishingFight : MonoBehaviour
                 tension += tuning.outOfZoneTensionRate * (0.25f + 0.75f * severity) * dt;
             }
             tension = Mathf.Min(tension, tuning.tensionMax + 1f);
+            line.SetTensionColor(tension / Mathf.Max(0.01f, tuning.tensionMax));
 
             if (tension >= tuning.tensionMax) tensionOverTime += dt;
             else tensionOverTime = 0f;
