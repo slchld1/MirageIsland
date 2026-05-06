@@ -26,6 +26,7 @@ public class FishingController : MonoBehaviour
     [Header("Cast Charge")]
     [SerializeField] private CastChargeUI castChargeUI;
     [SerializeField] private CatchBarUI catchBarUI;
+    [SerializeField] private FightArenaOverlay arenaOverlay;
 
     [Header("Fish")]
     [Tooltip("Prefab with Fish.cs + SpriteRenderer; spawned at lure on hook")]
@@ -302,6 +303,7 @@ public class FishingController : MonoBehaviour
         Debug.Log($"[Fishing] HOOKED via {lureSubMode}. Bait left: {(ActiveRod != null ? ActiveRod.baitCount : 0)}");
         state = FishingState.FishHooked;
         catchBarUI?.Show();
+        arenaOverlay?.Show(arena);
         SoundEffectManager.Play("FishBite");
 
     }
@@ -368,6 +370,7 @@ public class FishingController : MonoBehaviour
     private void CleanupFight()
     {
         catchBarUI?.Hide();
+        arenaOverlay?.Hide();
         if (activeFish != null) Destroy(activeFish.gameObject);
         if (activeFight != null) Destroy(activeFight);
         activeFish = null;
