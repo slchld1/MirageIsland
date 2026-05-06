@@ -301,7 +301,7 @@ public class FishingController : MonoBehaviour
 
         Debug.Log($"[Fishing] HOOKED via {lureSubMode}. Bait left: {(ActiveRod != null ? ActiveRod.baitCount : 0)}");
         state = FishingState.FishHooked;
-        catchBarUI.Show();
+        catchBarUI?.Show();
         SoundEffectManager.Play("FishBite");
 
     }
